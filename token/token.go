@@ -37,3 +37,15 @@ const (
 	FUNCTION = "FUNCTION"
 	LET      = "LET"
 )
+
+var keywords = map[string]TokenType{
+	"func": FUNCTION,
+	"let":  LET,
+}
+
+func FindKeywordOrIdent(keyword string) TokenType {
+	if word, ok := keywords[keyword]; ok {
+		return word
+	}
+	return IDENT
+}
