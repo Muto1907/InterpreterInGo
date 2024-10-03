@@ -3,11 +3,11 @@ package lexer
 import (
 	"testing"
 
-	"../token"
+	"github.com/Muto1907/interpreterInGo/token"
 )
 
 func TestNextToken(t *testing.T) {
-	input := `=+(){},;`
+	input := `=+-*/(){},;`
 
 	tests := []struct {
 		expectedType    token.TokenType
@@ -20,11 +20,11 @@ func TestNextToken(t *testing.T) {
 		{token.DIV, "/"},
 		{token.PARENL, "("},
 		{token.PARENR, ")"},
-		{token.BRACEL, "}"},
+		{token.BRACEL, "{"},
 		{token.BRACER, "}"},
 		{token.COMMA, ","},
 		{token.SEMICOLON, ";"},
-		{token.EOF, "EOF"},
+		{token.EOF, ""},
 	}
 
 	l := New(input)
@@ -34,7 +34,7 @@ func TestNextToken(t *testing.T) {
 
 		if tok.Type != tt.expectedType {
 			t.Fatalf("tests[%d] - wrong literal. expected=%q, got=%q",
-				i, tt.expectedLiteral, tok.Literal)
+				i, tt.expectedType, tok.Type)
 		}
 
 		if tok.Literal != tt.expectedLiteral {
