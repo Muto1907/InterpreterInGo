@@ -1,6 +1,8 @@
 package lexer
 
-import "github.com/Muto1907/interpreterInGo/token"
+import (
+	"github.com/Muto1907/interpreterInGo/token"
+)
 
 type Lexer struct {
 	input            string
@@ -53,6 +55,12 @@ func (l *Lexer) NextToken() token.Token {
 		tok = newToken(token.BRACEL, l.char)
 	case '}':
 		tok = newToken(token.BRACER, l.char)
+	case '<':
+		tok = newToken(token.LT, l.char)
+	case '>':
+		tok = newToken(token.GT, l.char)
+	case '!':
+		tok = newToken(token.NOT, l.char)
 	case 0:
 		tok.Literal = ""
 		tok.Type = token.EOF

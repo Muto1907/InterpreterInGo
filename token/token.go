@@ -23,6 +23,9 @@ const (
 	MINUS  = "-"
 	MULT   = "*"
 	DIV    = "/"
+	NOT    = "!"
+	LT     = "<"
+	GT     = ">"
 
 	// Delimeters
 	COMMA     = ","
