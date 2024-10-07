@@ -40,7 +40,7 @@ let me = {"name": "Mahmut", "profession": "Student"};
 
 #### Functions Bound to Variables
 ```go
-let add = fn(x, y) {
+let add = func(x, y) {
     x + y;
 };
 ```
@@ -48,7 +48,7 @@ let add = fn(x, y) {
 #### Higher-Order Functions
 Functions can take other functions as arguments and return functions.
 ```go
-let twice = fn(f, x) {
+let twice = func(f, x) {
     f(f(x));
 };
 ```
