@@ -1,5 +1,7 @@
 package ast
 
+import "github.com/Muto1907/interpreterInGo/token"
+
 type Node interface {
 	TokenLiteral() string
 }
@@ -23,4 +25,25 @@ func (p *Program) TokenLiteral() string {
 		return p.Statements[0].TokenLiteral()
 	}
 	return ""
+}
+
+type LetStatement struct {
+	Token      token.Token
+	Expression Expression
+	Name       *Identifier
+}
+
+func (ls *LetStatement) statementNode() {}
+func (ls *LetStatement) TokenLiteral() string {
+	return ls.Token.Literal
+}
+
+type Identifier struct {
+	Token token.Token
+	Value string
+}
+
+func (id *Identifier) expressionNode() {}
+func (id *Identifier) TokenLiteral() string {
+	return id.Token.Literal
 }
