@@ -1,6 +1,8 @@
 package parser
 
 import (
+	"fmt"
+
 	"github.com/Muto1907/interpreterInGo/ast"
 	"github.com/Muto1907/interpreterInGo/lexer"
 	"github.com/Muto1907/interpreterInGo/token"
@@ -10,13 +12,21 @@ type Parser struct {
 	l         *lexer.Lexer
 	currToken token.Token
 	peekToken token.Token
+	errors    []string
 }
 
 func New(lex *lexer.Lexer) *Parser {
-	parser := &Parser{l: lex}
+	parser := &Parser{
+		l:      lex,
+		errors: []string{},
+	}
 	parser.nextToken()
 	parser.nextToken()
 	return parser
+}
+
+func (parser *Parser) Errors() []string {
+	return parser.errors
 }
 
 func (parser *Parser) nextToken() {
@@ -69,11 +79,15 @@ func (parser *Parser) currentTokenIs(t token.TokenType) bool {
 func (parser *Parser) peekTokenIs(t token.TokenType) bool {
 	return parser.peekToken.Type == t
 }
-
+func (parser *Parser) peekError(t token.TokenType) {
+	msg := fmt.Sprintf("expected next token to be %s, got %s instead", t, parser.peekToken.Type)
+	parser.errors = append(parser.errors, msg)
+}
 func (parser *Parser) expectPeek(t token.TokenType) bool {
 	if parser.peekTokenIs(t) {
 		parser.nextToken()
 		return true
 	}
+	parser.peekError(t)
 	return false
 }
