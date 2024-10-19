@@ -12,10 +12,11 @@ type Parser struct {
 	peekToken token.Token
 }
 
-func New(lex *lexer.Lexer) Parser {
+func New(lex *lexer.Lexer) *Parser {
 	parser := &Parser{l: lex}
 	parser.nextToken()
 	parser.nextToken()
+	return parser
 }
 
 func (parser *Parser) nextToken() {
