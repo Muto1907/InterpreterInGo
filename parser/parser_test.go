@@ -159,6 +159,52 @@ func TestParsingPrefixExpr(t *testing.T) {
 	}
 }
 
+func TestParsingInfixExpr(t *testing.T) {
+	Tests := []struct {
+		inp      string
+		leftVal  int64
+		operator string
+		rightVal int64
+	}{
+		{"8 + 7;", 8, "+", 7},
+		{"8 - 7;", 8, "-", 7},
+		{"8 * 7;", 8, "*", 7},
+		{"8 / 7;", 8, "/", 7},
+		{"8 > 7;", 8, ">", 7},
+		{"8 < 7;", 8, "<", 7},
+		{"8 == 7;", 8, "==", 7},
+		{"8 != 7;", 8, "!=", 7},
+	}
+
+	for _, tcase := range Tests {
+		lex := lexer.New(tcase.inp)
+		parser := New(lex)
+		program := parser.ParseProgram()
+		checkParserErrors(t, parser)
+		if len(program.Statements) != 1 {
+			t.Fatalf("Program has more or less than 1 Statement. got=%d", len(program.Statements))
+		}
+		stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+		if !ok {
+			t.Fatalf("Statement is not ExpressionStatement. got=%T", program.Statements[0])
+		}
+		inf, ok := stmt.Expression.(*ast.InfixExpression)
+		if !ok {
+			t.Fatalf("Statement Expression is not of Type InfixExpression. got=%T", stmt.Expression)
+		}
+		if !testIntegerLiteral(t, inf.Left, tcase.leftVal) {
+			return
+		}
+		if inf.Operator != tcase.operator {
+			t.Fatalf("Operator is not %s. got=%s", tcase.operator, inf.Operator)
+		}
+		if !testIntegerLiteral(t, inf.Right, tcase.rightVal) {
+			return
+		}
+
+	}
+}
+
 func testLetStatement(t *testing.T, st ast.Statement, ident string) bool {
 	if st.TokenLiteral() != "let" {
 		t.Errorf("st.Tokenliteral not 'let'. got=%q", st.TokenLiteral())
