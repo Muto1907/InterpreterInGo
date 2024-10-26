@@ -2,6 +2,7 @@ package parser
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/Muto1907/interpreterInGo/ast"
 	"github.com/Muto1907/interpreterInGo/lexer"
@@ -40,6 +41,7 @@ func New(lex *lexer.Lexer) *Parser {
 	}
 	parser.prefixParseFncs = make(map[token.TokenType]prefixParseFnc)
 	parser.addPrefixFnc(token.IDENT, parser.parseIdentifier)
+	parser.addPrefixFnc(token.INT, parser.parseIntegerLiteral)
 	parser.nextToken()
 	parser.nextToken()
 	return parser
@@ -148,4 +150,17 @@ func (parser *Parser) parseExpression(precedence int) ast.Expression {
 
 func (parser *Parser) parseIdentifier() ast.Expression {
 	return &ast.Identifier{Token: parser.currToken, Value: parser.currToken.Literal}
+}
+
+func (parser *Parser) parseIntegerLiteral() ast.Expression {
+	inte := &ast.IntegerLiteral{Token: parser.currToken}
+
+	val, err := strconv.ParseInt(parser.currToken.Literal, 0, 64)
+	if err != nil {
+		msg := fmt.Sprintf("could not parse %q as Integer", parser.currToken.Literal)
+		parser.errors = append(parser.errors, msg)
+		return nil
+	}
+	inte.Value = val
+	return inte
 }
