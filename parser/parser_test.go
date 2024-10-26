@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/Muto1907/interpreterInGo/ast"
@@ -122,6 +123,42 @@ func TestIntegerExpr(t *testing.T) {
 
 }
 
+func TestParsingPrefixExpr(t *testing.T) {
+	Tests := []struct {
+		inp      string
+		operator string
+		intVal   int64
+	}{
+		{"!8", "!", 8},
+		{"-1907", "-", 1907},
+	}
+
+	for _, tcase := range Tests {
+		lex := lexer.New(tcase.inp)
+		parser := New(lex)
+		program := parser.ParseProgram()
+		checkParserErrors(t, parser)
+		if len(program.Statements) != 1 {
+			t.Fatalf("Program has more or less than 1 Statement. got=%d", len(program.Statements))
+		}
+		stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+		if !ok {
+			t.Fatalf("Statement is not ExpressionStatement. got=%T", program.Statements[0])
+		}
+		prf, ok := stmt.Expression.(*ast.PrefixExpression)
+		if !ok {
+			t.Fatalf("Statement Expression is not of Type PrefixExpression. got=%T", stmt.Expression)
+		}
+		if prf.operator != tcase.operator {
+			t.Fatalf("Operator is not %s. got=%s", tcase.operator, prf.operator)
+		}
+		if !testIntegerLiteral(t, prf.Right, tcase.intVal) {
+			return
+		}
+
+	}
+}
+
 func testLetStatement(t *testing.T, st ast.Statement, ident string) bool {
 	if st.TokenLiteral() != "let" {
 		t.Errorf("st.Tokenliteral not 'let'. got=%q", st.TokenLiteral())
@@ -152,4 +189,23 @@ func checkParserErrors(t *testing.T, parser *Parser) {
 		t.Errorf("parser error: %q", msg)
 	}
 	t.FailNow()
+}
+
+func testIntegerLiteral(t *testing.T, expr ast.Expression, val int64) bool {
+	inte, ok := expr.(*ast.IntegerLiteral)
+	if !ok {
+		t.Errorf("Expression not IntegerLiteral. got=%T", expr)
+		return false
+	}
+
+	if inte.Value != val {
+		t.Errorf("inte.Value is not %d. got=%d", val, inte.Value)
+		return false
+	}
+
+	if inte.TokenLiteral() != fmt.Sprintf("%d", val) {
+		t.Errorf("inte.TokenLiteral not %d. got=%s", val, inte.TokenLiteral())
+		return false
+	}
+	return true
 }
