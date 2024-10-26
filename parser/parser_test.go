@@ -81,7 +81,7 @@ func TestIdentifierExpr(t *testing.T) {
 	}
 	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
 	if !ok {
-		t.Fatalf("Statement is not ExpreseionStatement. got=%T", program.Statements[0])
+		t.Fatalf("Statement is not ExpressionStatement. got=%T", program.Statements[0])
 	}
 	id, ok := stmt.Expression.(*ast.Identifier)
 	if !ok {
@@ -107,17 +107,17 @@ func TestIntegerExpr(t *testing.T) {
 	}
 	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
 	if !ok {
-		t.Fatalf("Statement is not ExpreseionStatement. got=%T", program.Statements[0])
+		t.Fatalf("Statement is not ExpressionStatement. got=%T", program.Statements[0])
 	}
 	inte, ok := stmt.Expression.(*ast.IntegerLiteral)
 	if !ok {
-		t.Fatalf("Statement Expression is not of Type Identifier. got=%T", stmt.Expression)
+		t.Fatalf("Statement Expression is not of Type Integer. got=%T", stmt.Expression)
 	}
 	if inte.Value != 1907 {
-		t.Fatalf("Identifier Value is not thingy. got=%d", inte.Value)
+		t.Fatalf("Integer Value is not thingy. got=%d", inte.Value)
 	}
 	if inte.TokenLiteral() != "1907" {
-		t.Fatalf("Token Literal is not thingy. got=%s", inte.TokenLiteral())
+		t.Fatalf("Token Literal is not %d. got=%s", 5, inte.TokenLiteral())
 	}
 
 }
