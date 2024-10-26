@@ -124,3 +124,20 @@ func (inte *IntegerLiteral) TokenLiteral() string {
 func (inte *IntegerLiteral) String() string {
 	return inte.Token.Literal
 }
+
+type PrefixExpression struct {
+	Token    token.Token
+	Operator string
+	Right    Expression
+}
+
+func (pref *PrefixExpression) expressionNode() {}
+func (pref *PrefixExpression) TokenLiteral() string {
+	return pref.Token.Literal
+}
+func (pref *PrefixExpression) String() string {
+	var output bytes.Buffer
+	output.WriteString("( " + pref.Operator)
+	output.WriteString(pref.Right.String() + ")")
+	return output.String()
+}
