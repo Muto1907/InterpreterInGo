@@ -142,6 +142,7 @@ func (parser *Parser) expectPeek(t token.TokenType) bool {
 func (parser *Parser) parseExpression(precedence int) ast.Expression {
 	prefix := parser.prefixParseFncs[parser.currToken.Type]
 	if prefix == nil {
+		parser.noPrefixParseFuncFoundError(parser.currToken.Type)
 		return nil
 	}
 	leftExp := prefix()
@@ -163,4 +164,9 @@ func (parser *Parser) parseIntegerLiteral() ast.Expression {
 	}
 	inte.Value = val
 	return inte
+}
+
+func (parser *Parser) noPrefixParseFuncFoundError(ttype token.TokenType) {
+	msg := fmt.Sprintf("No Prefix Parse Function found for %s", ttype)
+	parser.errors = append(parser.errors, msg)
 }
