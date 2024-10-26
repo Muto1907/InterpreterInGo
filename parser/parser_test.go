@@ -149,8 +149,8 @@ func TestParsingPrefixExpr(t *testing.T) {
 		if !ok {
 			t.Fatalf("Statement Expression is not of Type PrefixExpression. got=%T", stmt.Expression)
 		}
-		if prf.operator != tcase.operator {
-			t.Fatalf("Operator is not %s. got=%s", tcase.operator, prf.operator)
+		if prf.Operator != tcase.operator {
+			t.Fatalf("Operator is not %s. got=%s", tcase.operator, prf.Operator)
 		}
 		if !testIntegerLiteral(t, prf.Right, tcase.intVal) {
 			return
