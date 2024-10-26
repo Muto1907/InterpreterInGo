@@ -43,7 +43,7 @@ func TestNextToken(t *testing.T) {
 		{token.LET, "let"},
 		{token.IDENT, "add"},
 		{token.ASSIGN, "="},
-		{token.FUNCTION, "func"},
+		{token.FUNCTION, "fnc"},
 		{token.PARENL, "("},
 		{token.IDENT, "x"},
 		{token.COMMA, ","},
