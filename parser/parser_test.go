@@ -205,6 +205,74 @@ func TestParsingInfixExpr(t *testing.T) {
 	}
 }
 
+func TestPrecedenceParsing(t *testing.T) {
+	test := []struct {
+		inp   string
+		expct string
+	}{
+		{
+			"f * -b",
+			"(f * (-b))",
+		},
+		{
+			"-!f",
+			"(-(!f))",
+		},
+		{
+			"g + f + b",
+			"((g + f) + b)",
+		},
+		{
+			"g - f + b",
+			"((g - f) + b)",
+		},
+		{
+			"g * f * b",
+			"((g * f) * b)",
+		},
+		{
+			"g / f * b",
+			"((g / f) * b)",
+		},
+		{
+			"g - f / b",
+			"(g - (f / b))",
+		},
+		{
+			"g + f / b + a * e - c",
+			"(((g + (f / b)) + (a * e)) - c)",
+		},
+		{
+			"12 + 43; -2 * 64",
+			"(12 + 43)((-2) * 64)",
+		},
+		{
+			"2 < 42 == 32 < 4",
+			"((2 < 42) == (32 < 4))",
+		},
+		{
+			"532 < 42 != 332 > 41",
+			"((532 < 42) != (332 > 41))",
+		},
+		{
+			"17 - 2 * 4 == 6 * 2 + 23 * 5",
+			"((17 - (2 * 4)) == ((6 * 2) + (23 * 5)))",
+		},
+	}
+
+	for _, tcase := range test {
+		lex := lexer.New(tcase.inp)
+		parser := New(lex)
+		program := parser.ParseProgram()
+		checkParserErrors(t, parser)
+
+		str := program.String()
+		if str != tcase.expct {
+			t.Errorf("expected=%q, received=%q", tcase.expct, str)
+		}
+	}
+}
+
 func testLetStatement(t *testing.T, st ast.Statement, ident string) bool {
 	if st.TokenLiteral() != "let" {
 		t.Errorf("st.Tokenliteral not 'let'. got=%q", st.TokenLiteral())
