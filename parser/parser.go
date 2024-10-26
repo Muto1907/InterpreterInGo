@@ -8,11 +8,18 @@ import (
 	"github.com/Muto1907/interpreterInGo/token"
 )
 
+type (
+	prefixParseFnc func() ast.Expression
+	infixParseFnc  func(ast.Expression) ast.Expression
+)
+
 type Parser struct {
-	l         *lexer.Lexer
-	currToken token.Token
-	peekToken token.Token
-	errors    []string
+	l               *lexer.Lexer
+	currToken       token.Token
+	peekToken       token.Token
+	errors          []string
+	prefixParseFncs map[token.TokenType]prefixParseFnc
+	infixParseFncs  map[token.TokenType]infixParseFnc
 }
 
 func New(lex *lexer.Lexer) *Parser {
@@ -32,6 +39,14 @@ func (parser *Parser) Errors() []string {
 func (parser *Parser) nextToken() {
 	parser.currToken = parser.peekToken
 	parser.peekToken = parser.l.NextToken()
+}
+
+func (parser *Parser) AddPrefixFnc(tokenType token.TokenType, fnc prefixParseFnc) {
+	parser.prefixParseFncs[tokenType] = fnc
+}
+
+func (parser *Parser) AddInfixFnc(tokenType token.TokenType, fnc infixParseFnc) {
+	parser.infixParseFncs[tokenType] = fnc
 }
 
 func (parser *Parser) ParseProgram() *ast.Program {
