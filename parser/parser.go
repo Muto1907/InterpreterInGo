@@ -42,6 +42,8 @@ func New(lex *lexer.Lexer) *Parser {
 	parser.prefixParseFncs = make(map[token.TokenType]prefixParseFnc)
 	parser.addPrefixFnc(token.IDENT, parser.parseIdentifier)
 	parser.addPrefixFnc(token.INT, parser.parseIntegerLiteral)
+	parser.addPrefixFnc(token.MINUS, parser.parsePrefixExpression)
+	parser.addPrefixFnc(token.NOT, parser.parsePrefixExpression)
 	parser.nextToken()
 	parser.nextToken()
 	return parser
@@ -164,6 +166,18 @@ func (parser *Parser) parseIntegerLiteral() ast.Expression {
 	}
 	inte.Value = val
 	return inte
+}
+
+func (parser *Parser) parsePrefixExpression() ast.Expression {
+	pref := &ast.PrefixExpression{
+		Token:    parser.currToken,
+		Operator: parser.currToken.Literal,
+	}
+
+	parser.nextToken()
+
+	pref.Right = parser.parseExpression(PREFIX)
+	return pref
 }
 
 func (parser *Parser) noPrefixParseFuncFoundError(ttype token.TokenType) {
