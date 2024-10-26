@@ -70,6 +70,32 @@ func TestReturnStatements(t *testing.T) {
 	}
 }
 
+func TestIdentifierExpr(t *testing.T) {
+	input := "thingy"
+	lex := lexer.New(input)
+	pars := New(lex)
+	program := pars.ParseProgram()
+	checkParserErrors(t, pars)
+	if len(program.Statements) != 1 {
+		t.Fatalf("Program has more or less than 1 Statement. got=%d", len(program.Statements))
+	}
+	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("Statement is not ExpreseionStatement. got=%T", program.Statements[0])
+	}
+	id, ok := stmt.Expression.(*ast.Identifier)
+	if !ok {
+		t.Fatalf("Statement Expression is not of Type Identifiert. got=%T", stmt.Expression)
+	}
+	if id.Value != "thingy" {
+		t.Fatalf("Identifier Value is not thingy. got=%s", id.Value)
+	}
+	if id.TokenLiteral() != "thingy" {
+		t.Fatalf("Token Literal is not thingy. got=%s", id.TokenLiteral())
+	}
+
+}
+
 func testLetStatement(t *testing.T, st ast.Statement, ident string) bool {
 	if st.TokenLiteral() != "let" {
 		t.Errorf("st.Tokenliteral not 'let'. got=%q", st.TokenLiteral())
