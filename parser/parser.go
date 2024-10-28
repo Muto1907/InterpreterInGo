@@ -61,6 +61,7 @@ func New(lex *lexer.Lexer) *Parser {
 	}
 	parser.addPrefixFnc(token.TRUE, parser.parseBoolean)
 	parser.addPrefixFnc(token.FALSE, parser.parseBoolean)
+	parser.addPrefixFnc(token.PARENL, parser.ParseGroupedExpr)
 	parser.nextToken()
 	parser.nextToken()
 	return parser
@@ -209,6 +210,17 @@ func (parser *Parser) parseIntegerLiteral() ast.Expression {
 func (parser *Parser) parseBoolean() ast.Expression {
 	boolean := &ast.Boolean{Token: parser.currToken, Value: parser.currentTokenIs(token.TRUE)}
 	return boolean
+}
+
+func (parser *Parser) ParseGroupedExpr() ast.Expression {
+	parser.nextToken()
+
+	expr := parser.parseExpression(LOWEST)
+
+	if !parser.expectPeek(token.PARENR) {
+		return nil
+	}
+	return expr
 }
 
 func (parser *Parser) parsePrefixExpression() ast.Expression {
