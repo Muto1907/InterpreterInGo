@@ -62,6 +62,7 @@ func New(lex *lexer.Lexer) *Parser {
 	parser.addPrefixFnc(token.TRUE, parser.parseBoolean)
 	parser.addPrefixFnc(token.FALSE, parser.parseBoolean)
 	parser.addPrefixFnc(token.PARENL, parser.ParseGroupedExpr)
+	parser.addPrefixFnc(token.IF, parser.parseIfExpression)
 	parser.nextToken()
 	parser.nextToken()
 	return parser
@@ -221,6 +222,53 @@ func (parser *Parser) ParseGroupedExpr() ast.Expression {
 		return nil
 	}
 	return expr
+}
+
+func (parser *Parser) parseIfExpression() ast.Expression {
+	iff := &ast.IfExpression{
+		Token: parser.currToken,
+	}
+	if !parser.expectPeek(token.PARENL) {
+		return nil
+	}
+
+	parser.nextToken()
+	iff.Condition = parser.parseExpression(LOWEST)
+	if !parser.expectPeek(token.PARENR) {
+		return nil
+	}
+
+	if !parser.expectPeek(token.BRACEL) {
+		return nil
+	}
+	iff.Then = parser.parseBlockStatement()
+
+	if parser.peekTokenIs(token.ELSE) {
+		parser.nextToken()
+		if !parser.expectPeek(token.BRACEL) {
+			return nil
+		}
+
+		iff.Alt = parser.parseBlockStatement()
+	}
+
+	return iff
+
+}
+
+func (parser *Parser) parseBlockStatement() *ast.BlockStatement {
+	blck := &ast.BlockStatement{Token: parser.currToken, Statements: []ast.Statement{}}
+
+	parser.nextToken()
+
+	for !parser.currentTokenIs(token.BRACER) && !parser.currentTokenIs(token.EOF) {
+		stmt := parser.parseStatement()
+		if stmt != nil {
+			blck.Statements = append(blck.Statements, stmt)
+		}
+		parser.nextToken()
+	}
+	return blck
 }
 
 func (parser *Parser) parsePrefixExpression() ast.Expression {
