@@ -123,6 +123,43 @@ func TestIntegerExpr(t *testing.T) {
 
 }
 
+func TestBooleanExpression(t *testing.T) {
+	Tests := []struct {
+		inp          string
+		expectedBool bool
+	}{
+		{"true;", true},
+		{"false;", false},
+	}
+
+	for _, tt := range Tests {
+		lex := lexer.New(tt.inp)
+		parser := New(lex)
+		program := parser.ParseProgram()
+		checkParserErrors(t, parser)
+
+		if len(program.Statements) != 1 {
+			t.Fatalf("program has not enough statements. got=%d",
+				len(program.Statements))
+		}
+
+		stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+		if !ok {
+			t.Fatalf("program.Statements[0] is not ast.ExpressionStatement. got=%T",
+				program.Statements[0])
+		}
+
+		boolean, ok := stmt.Expression.(*ast.Boolean)
+		if !ok {
+			t.Fatalf("exp not *ast.Boolean. got=%T", stmt.Expression)
+		}
+		if boolean.Value != tt.expectedBool {
+			t.Errorf("boolean.Value not %t. got=%t", tt.expectedBool,
+				boolean.Value)
+		}
+	}
+}
+
 func TestParsingPrefixExpr(t *testing.T) {
 	Tests := []struct {
 		inp      string
