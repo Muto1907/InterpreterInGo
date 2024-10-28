@@ -173,3 +173,43 @@ func (bool *Boolean) TokenLiteral() string {
 func (bool *Boolean) String() string {
 	return bool.Token.Literal
 }
+
+type IfExpression struct {
+	Token     token.Token
+	Condition Expression
+	then      *BlockStatement
+	alt       *BlockStatement
+}
+
+func (iff *IfExpression) expressionNode() {}
+func (iff *IfExpression) TokenLiteral() string {
+	return iff.Token.Literal
+}
+func (iff *IfExpression) String() string {
+	var output bytes.Buffer
+	output.WriteString("if")
+	output.WriteString(iff.Condition.String() + " ")
+	output.WriteString(iff.then.String())
+	if iff.alt != nil {
+		output.WriteString(" else ")
+		output.WriteString(iff.alt.String())
+	}
+	return output.String()
+}
+
+type BlockStatement struct {
+	Token      token.Token
+	Statements []Statement
+}
+
+func (blck *BlockStatement) statementNode() {}
+func (blck *BlockStatement) TokenLiteral() string {
+	return blck.Token.Literal
+}
+func (blck *BlockStatement) String() string {
+	var output bytes.Buffer
+	for _, stmt := range blck.Statements {
+		output.WriteString(stmt.String())
+	}
+	return output.String()
+}
