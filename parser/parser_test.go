@@ -164,10 +164,13 @@ func TestParsingPrefixExpr(t *testing.T) {
 	Tests := []struct {
 		inp      string
 		operator string
-		intVal   int64
+		val      interface{}
 	}{
 		{"!8", "!", 8},
 		{"-1907", "-", 1907},
+		{"!false", "!", false},
+		{"!true", "!", true},
+		{"-false", "-", false},
 	}
 
 	for _, tcase := range Tests {
@@ -189,7 +192,7 @@ func TestParsingPrefixExpr(t *testing.T) {
 		if prf.Operator != tcase.operator {
 			t.Fatalf("Operator is not %s. got=%s", tcase.operator, prf.Operator)
 		}
-		if !testIntegerLiteral(t, prf.Right, tcase.intVal) {
+		if !testLiteralExpr(t, prf.Right, tcase.val) {
 			return
 		}
 
@@ -199,9 +202,9 @@ func TestParsingPrefixExpr(t *testing.T) {
 func TestParsingInfixExpr(t *testing.T) {
 	Tests := []struct {
 		inp      string
-		leftVal  int64
+		leftVal  interface{}
 		operator string
-		rightVal int64
+		rightVal interface{}
 	}{
 		{"8 + 7;", 8, "+", 7},
 		{"8 - 7;", 8, "-", 7},
@@ -211,6 +214,8 @@ func TestParsingInfixExpr(t *testing.T) {
 		{"8 < 7;", 8, "<", 7},
 		{"8 == 7;", 8, "==", 7},
 		{"8 != 7;", 8, "!=", 7},
+		{"true == false", true, "==", false},
+		{"true != false", true, "!=", false},
 	}
 
 	for _, tcase := range Tests {
@@ -229,13 +234,13 @@ func TestParsingInfixExpr(t *testing.T) {
 		if !ok {
 			t.Fatalf("Statement Expression is not of Type InfixExpression. got=%T", stmt.Expression)
 		}
-		if !testIntegerLiteral(t, inf.Left, tcase.leftVal) {
+		if !testLiteralExpr(t, inf.Left, tcase.leftVal) {
 			return
 		}
 		if inf.Operator != tcase.operator {
 			t.Fatalf("Operator is not %s. got=%s", tcase.operator, inf.Operator)
 		}
-		if !testIntegerLiteral(t, inf.Right, tcase.rightVal) {
+		if !testLiteralExpr(t, inf.Right, tcase.rightVal) {
 			return
 		}
 
@@ -294,6 +299,23 @@ func TestPrecedenceParsing(t *testing.T) {
 		{
 			"17 - 2 * 4 == 6 * 2 + 23 * 5",
 			"((17 - (2 * 4)) == ((6 * 2) + (23 * 5)))",
+		},
+
+		{
+			"true",
+			"true",
+		},
+		{
+			"false",
+			"false",
+		},
+		{
+			"2 < 23 == true",
+			"((2 < 23) == true)",
+		},
+		{
+			"6 < 2 == false",
+			"((6 < 2) == false)",
 		},
 	}
 
@@ -405,6 +427,25 @@ func testInfixExpr(t *testing.T, exp ast.Expression, left interface{},
 	return true
 }
 
+func testBoolLiteral(t *testing.T, exp ast.Expression, val bool) bool {
+	boo, ok := exp.(*ast.Boolean)
+	if !ok {
+		t.Errorf("Expression not BoolLiteral. got=%T", exp)
+		return false
+	}
+
+	if boo.Value != val {
+		t.Errorf("boo.Value is not %t. got=%t", val, boo.Value)
+		return false
+	}
+
+	if boo.TokenLiteral() != fmt.Sprintf("%t", val) {
+		t.Errorf("boo.TokenLiteral not %t. got=%s", val, boo.TokenLiteral())
+		return false
+	}
+	return true
+}
+
 func testLiteralExpr(
 	t *testing.T,
 	exp ast.Expression,
@@ -417,7 +458,8 @@ func testLiteralExpr(
 		return testIntegerLiteral(t, exp, v)
 	case string:
 		return testIdentifier(t, exp, v)
-
+	case bool:
+		return testBoolLiteral(t, exp, v)
 	}
 	t.Errorf("type of exp not handled. got=%T", exp)
 	return false
