@@ -323,3 +323,65 @@ func testIntegerLiteral(t *testing.T, expr ast.Expression, val int64) bool {
 	}
 	return true
 }
+
+func testIdentifier(t *testing.T, expr ast.Expression, val string) bool {
+	id, ok := expr.(*ast.Identifier)
+	if !ok {
+		t.Errorf("Expression not Identifier. got=%T", expr)
+		return false
+	}
+
+	if id.Value != val {
+		t.Errorf("id.Value is not %s. got=%s", val, id.Value)
+		return false
+	}
+
+	if id.TokenLiteral() != val {
+		t.Errorf("id.TokenLiteral not %s. got=%s", val, id.TokenLiteral())
+		return false
+	}
+	return true
+}
+
+func testInfixExpr(t *testing.T, exp ast.Expression, left interface{},
+	operator string, right interface{}) bool {
+
+	opExp, ok := exp.(*ast.InfixExpression)
+	if !ok {
+		t.Errorf("exp is not ast.OperatorExpression. got=%T(%s)", exp, exp)
+		return false
+	}
+
+	if !testLiteralExpr(t, opExp.Left, left) {
+		return false
+	}
+
+	if opExp.Operator != operator {
+		t.Errorf("exp.Operator is not '%s'. got=%q", operator, opExp.Operator)
+		return false
+	}
+
+	if !testLiteralExpr(t, opExp.Right, right) {
+		return false
+	}
+
+	return true
+}
+
+func testLiteralExpr(
+	t *testing.T,
+	exp ast.Expression,
+	expected interface{},
+) bool {
+	switch v := expected.(type) {
+	case int:
+		return testIntegerLiteral(t, exp, int64(v))
+	case int64:
+		return testIntegerLiteral(t, exp, v)
+	case string:
+		return testIdentifier(t, exp, v)
+
+	}
+	t.Errorf("type of exp not handled. got=%T", exp)
+	return false
+}
