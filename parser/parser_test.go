@@ -160,6 +160,99 @@ func TestBooleanExpression(t *testing.T) {
 	}
 }
 
+func TestIfExpression(t *testing.T) {
+	input := `if (f > b) { g }`
+	lex := lexer.New(input)
+	parser := New(lex)
+	program := parser.ParseProgram()
+	checkParserErrors(t, parser)
+	if len(program.Statements) != 1 {
+		t.Fatalf("program has not enough statements. got=%d",
+			len(program.Statements))
+	}
+
+	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not ast.ExpressionStatement. got=%T",
+			program.Statements[0])
+	}
+
+	iff, ok := stmt.Expression.(*ast.IfExpression)
+	if !ok {
+		t.Fatalf("Wrong Expression type. Expected IfExpression. got=%T", stmt.Expression)
+	}
+
+	if !testInfixExpr(t, iff.Condition, "f", ">", "b") {
+		return
+	}
+
+	if len(iff.Then.Statements) != 1 {
+		t.Fatalf("Wrong number of Then Statements. got=%d", len(iff.Then.Statements))
+	}
+
+	then, ok := iff.Then.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("Wrong Statementtype for Statements[0] expected=ExpressionStatement. got=%T", iff.Then.Statements[0])
+	}
+
+	if !testIdentifier(t, then.Expression, "g") {
+		return
+	}
+
+	if iff.Alt != nil {
+		t.Errorf("iff.Alt.Statements is not nil. got=%v", iff.Alt)
+	}
+}
+
+func TestIfElseExpression(t *testing.T) {
+	input := `if (f > b) { g } else { h }`
+	lex := lexer.New(input)
+	parser := New(lex)
+	program := parser.ParseProgram()
+	checkParserErrors(t, parser)
+	if len(program.Statements) != 1 {
+		t.Fatalf("program has not enough statements. got=%d",
+			len(program.Statements))
+	}
+
+	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not ast.ExpressionStatement. got=%T",
+			program.Statements[0])
+	}
+
+	iff, ok := stmt.Expression.(*ast.IfExpression)
+	if !ok {
+		t.Fatalf("Wrong Expression type. Expected IfExpression. got=%T", stmt.Expression)
+	}
+
+	if !testInfixExpr(t, iff.Condition, "f", ">", "b") {
+		return
+	}
+
+	if len(iff.Then.Statements) != 1 {
+		t.Fatalf("Wrong number of Then Statements. got=%d", len(iff.Then.Statements))
+	}
+
+	then, ok := iff.Then.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("Wrong Statementtype for iff.then.Statements[0] expected=ExpressionStatement. got=%T", iff.Then.Statements[0])
+	}
+
+	if !testIdentifier(t, then.Expression, "g") {
+		return
+	}
+
+	alt, ok := iff.Alt.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("Wrong Statementtype for iff.alt.Statements[0] expected=ExpressionStatement. got=%T", iff.Alt.Statements[0])
+	}
+
+	if !testIdentifier(t, alt.Expression, "h") {
+		return
+	}
+}
+
 func TestParsingPrefixExpr(t *testing.T) {
 	Tests := []struct {
 		inp      string

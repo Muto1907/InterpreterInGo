@@ -177,8 +177,8 @@ func (bool *Boolean) String() string {
 type IfExpression struct {
 	Token     token.Token
 	Condition Expression
-	then      *BlockStatement
-	alt       *BlockStatement
+	Then      *BlockStatement
+	Alt       *BlockStatement
 }
 
 func (iff *IfExpression) expressionNode() {}
@@ -189,10 +189,10 @@ func (iff *IfExpression) String() string {
 	var output bytes.Buffer
 	output.WriteString("if")
 	output.WriteString(iff.Condition.String() + " ")
-	output.WriteString(iff.then.String())
-	if iff.alt != nil {
+	output.WriteString(iff.Then.String())
+	if iff.Alt != nil {
 		output.WriteString(" else ")
-		output.WriteString(iff.alt.String())
+		output.WriteString(iff.Alt.String())
 	}
 	return output.String()
 }
