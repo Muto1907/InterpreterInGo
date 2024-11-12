@@ -291,6 +291,35 @@ func TestFunctionExpr(t *testing.T) {
 	testInfixExpr(t, body.Expression, "f", "*", "b")
 }
 
+func TestParsingFuncParameters(t *testing.T) {
+	Tests := []struct {
+		input          string
+		expectedParams []string
+	}{
+		{input: "fnc() {};", expectedParams: []string{}},
+		{input: "fnc(f) {};", expectedParams: []string{"f"}},
+		{input: "fnc(g, f, b) {};", expectedParams: []string{"g", "f", "b"}},
+	}
+
+	for _, tcase := range Tests {
+		lex := lexer.New(tcase.input)
+		parser := New(lex)
+		program := parser.ParseProgram()
+		checkParserErrors(t, parser)
+
+		stmt := program.Statements[0].(*ast.ExpressionStatement)
+		fnc := stmt.Expression.(*ast.FuncLiteral)
+
+		if len(fnc.Parameters) != len(tcase.expectedParams) {
+			t.Fatalf("wrong number of Functionparameters expected=%d got=%d", len(tcase.expectedParams), len(fnc.Parameters))
+		}
+
+		for i, identifier := range tcase.expectedParams {
+			testLiteralExpr(t, fnc.Parameters[i], identifier)
+		}
+	}
+}
+
 func TestParsingPrefixExpr(t *testing.T) {
 	Tests := []struct {
 		inp      string
