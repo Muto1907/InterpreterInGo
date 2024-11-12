@@ -253,6 +253,44 @@ func TestIfElseExpression(t *testing.T) {
 	}
 }
 
+func TestFunctionExpr(t *testing.T) {
+	input := `fnc (f, b) { f * b; }`
+	lex := lexer.New(input)
+	parser := New(lex)
+	program := parser.ParseProgram()
+	checkParserErrors(t, parser)
+	if len(program.Statements) != 1 {
+		t.Fatalf("number of statements in program body not 1. got=%d", len(program.Statements))
+	}
+
+	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not ast.ExpressionStatement. got=%T",
+			program.Statements[0])
+	}
+
+	fnc, ok := stmt.Expression.(*ast.FuncExpression)
+	if !ok {
+		t.Fatalf("Wrong Expression type. Expected FuncExpression. got=%T", stmt.Expression)
+	}
+
+	if len(fnc.Parameters) != 2 {
+		t.Fatalf("Wrong number of Parameters. Expected 2 got=%d", len(fnc.Parameters))
+	}
+	testLiteralExpr(t, fnc.Parameters[0], "f")
+	testLiteralExpr(t, fnc.Parameters[1], "b")
+
+	if len(fnc.Body.Statements) != 1 {
+		t.Fatalf("Wrong number of Statements in function body. Expected 1 got=%d", len(fnc.Body.Statements))
+	}
+	body, ok := fnc.Body.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("Function Body is not an ExpressionStatement. got=%T", fnc.Body.Statements[0])
+	}
+
+	testInfixExpr(t, body.Expression, "f", "*", "b")
+}
+
 func TestParsingPrefixExpr(t *testing.T) {
 	Tests := []struct {
 		inp      string
