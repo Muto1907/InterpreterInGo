@@ -215,17 +215,17 @@ func (blck *BlockStatement) String() string {
 	return output.String()
 }
 
-type FuncExpression struct {
+type FuncLiteral struct {
 	Token      token.Token
 	Parameters []*Identifier
 	Body       *BlockStatement
 }
 
-func (fn *FuncExpression) expressionNode() {}
-func (fn *FuncExpression) TokenLiteral() string {
+func (fn *FuncLiteral) expressionNode() {}
+func (fn *FuncLiteral) TokenLiteral() string {
 	return fn.Token.Literal
 }
-func (fn *FuncExpression) String() string {
+func (fn *FuncLiteral) String() string {
 	var output bytes.Buffer
 	params := []string{}
 	for _, pa := range fn.Parameters {

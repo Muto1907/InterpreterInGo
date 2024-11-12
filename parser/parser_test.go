@@ -269,9 +269,9 @@ func TestFunctionExpr(t *testing.T) {
 			program.Statements[0])
 	}
 
-	fnc, ok := stmt.Expression.(*ast.FuncExpression)
+	fnc, ok := stmt.Expression.(*ast.FuncLiteral)
 	if !ok {
-		t.Fatalf("Wrong Expression type. Expected FuncExpression. got=%T", stmt.Expression)
+		t.Fatalf("Wrong Expression type. Expected FuncLiteral. got=%T", stmt.Expression)
 	}
 
 	if len(fnc.Parameters) != 2 {
