@@ -2,6 +2,7 @@ package ast
 
 import (
 	"bytes"
+	"strings"
 
 	"github.com/Muto1907/interpreterInGo/token"
 )
@@ -211,5 +212,27 @@ func (blck *BlockStatement) String() string {
 	for _, stmt := range blck.Statements {
 		output.WriteString(stmt.String())
 	}
+	return output.String()
+}
+
+type funcExpression struct {
+	Token      token.Token
+	Parameters []*Identifier
+	Body       *BlockStatement
+}
+
+func (fn *funcExpression) expressionNode() {}
+func (fn *funcExpression) TokenLiteral() string {
+	return fn.Token.Literal
+}
+func (fn *funcExpression) String() string {
+	var output bytes.Buffer
+	params := []string{}
+	for _, pa := range fn.Parameters {
+		params = append(params, pa.String())
+	}
+	output.WriteString(fn.TokenLiteral() + "( ")
+	output.WriteString(strings.Join(params, ", ") + ") ")
+	output.WriteString(fn.Body.String())
 	return output.String()
 }
