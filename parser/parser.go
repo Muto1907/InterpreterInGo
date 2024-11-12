@@ -263,7 +263,7 @@ func (parser *Parser) parseFunctionLiteral() ast.Expression {
 		return nil
 	}
 	fnc.Parameters = parser.parseFunctionParameters()
-	if !parser.expectPeek(token.PARENR) {
+	if !parser.expectPeek(token.BRACEL) {
 		return nil
 	}
 	fnc.Body = parser.parseBlockStatement()
