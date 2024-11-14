@@ -348,9 +348,9 @@ func TestCallExpressionParsing(t *testing.T) {
 	if len(callExp.Arguments) != 3 {
 		t.Fatalf("Wrong number of Arguments. Expected 3 got=%d", len(callExp.Arguments))
 	}
-	testLiteralExpr(t, callExp.Arguments[0], "1")
+	testLiteralExpr(t, callExp.Arguments[0], 1)
 	testInfixExpr(t, callExp.Arguments[1], 1, "+", 2)
-	testInfixExpr(t, callExp.Arguments[0], 2, "*", 3)
+	testInfixExpr(t, callExp.Arguments[2], 2, "*", 3)
 }
 
 func TestCallExpressionParameterParsing(t *testing.T) {

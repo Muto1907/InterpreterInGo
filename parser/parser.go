@@ -34,6 +34,7 @@ var precedences = map[token.TokenType]int{
 	token.PLUS:   SUM,
 	token.MULT:   PRODUCT,
 	token.DIV:    PRODUCT,
+	token.PARENL: CALL,
 }
 
 type Parser struct {
@@ -64,6 +65,7 @@ func New(lex *lexer.Lexer) *Parser {
 	parser.addPrefixFnc(token.PARENL, parser.ParseGroupedExpr)
 	parser.addPrefixFnc(token.IF, parser.parseIfExpression)
 	parser.addPrefixFnc(token.FUNCTION, parser.parseFunctionLiteral)
+	parser.addInfixFnc(token.PARENL, parser.parseCallExpression)
 	parser.nextToken()
 	parser.nextToken()
 	return parser
@@ -304,6 +306,34 @@ func (parser *Parser) parseFunctionParameters() []*ast.Identifier {
 		return nil
 	}
 	return parameters
+}
+
+func (parser *Parser) parseCallExpression(function ast.Expression) ast.Expression {
+	expr := &ast.CallExpression{Token: parser.currToken, Function: function}
+	expr.Arguments = parser.parseCallArguments()
+	return expr
+}
+
+func (parser *Parser) parseCallArguments() []ast.Expression {
+	args := []ast.Expression{}
+
+	if parser.peekTokenIs(token.PARENR) {
+		parser.nextToken()
+		return args
+	}
+	parser.nextToken()
+	args = append(args, parser.parseExpression(LOWEST))
+
+	for parser.peekTokenIs(token.COMMA) {
+		parser.nextToken()
+		parser.nextToken()
+		args = append(args, parser.parseExpression(LOWEST))
+	}
+
+	if !parser.expectPeek(token.PARENR) {
+		return nil
+	}
+	return args
 }
 
 func (parser *Parser) parsePrefixExpression() ast.Expression {
