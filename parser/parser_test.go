@@ -580,6 +580,18 @@ func TestPrecedenceParsing(t *testing.T) {
 			"!(true != false)",
 			"(!(true != false))",
 		},
+		{
+			"g + print(f * b) + e",
+			"((g + print((f * b))) + e)",
+		},
+		{
+			"print(g, f, 1, 9 * 0, 7 + 3, show(6, 7 * 8))",
+			"print(g, f, 1, (9 * 0), (7 + 3), show(6, (7 * 8)))",
+		},
+		{
+			"print(g + f + b * e / f + g)",
+			"print((((g + f) + ((b * e) / f)) + g))",
+		},
 	}
 
 	for _, tcase := range test {
