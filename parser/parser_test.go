@@ -320,6 +320,89 @@ func TestParsingFuncParameters(t *testing.T) {
 	}
 }
 
+func TestCallExpressionParsing(t *testing.T) {
+	input := "add(1, 1 + 2, 2 * 3)"
+	lex := lexer.New(input)
+	parser := New(lex)
+	program := parser.ParseProgram()
+	checkParserErrors(t, parser)
+	if len(program.Statements) != 1 {
+		t.Fatalf("number of statements in program body not 1. got=%d", len(program.Statements))
+	}
+
+	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not ast.ExpressionStatement. got=%T",
+			program.Statements[0])
+	}
+
+	callExp, ok := stmt.Expression.(*ast.CallExpression)
+	if !ok {
+		t.Fatalf("Wrong Expression type. Expected CallExpression. got=%T", stmt.Expression)
+	}
+
+	if !testIdentifier(t, callExp.Function, "add") {
+		return
+	}
+
+	if len(callExp.Arguments) != 3 {
+		t.Fatalf("Wrong number of Arguments. Expected 3 got=%d", len(callExp.Arguments))
+	}
+	testLiteralExpr(t, callExp.Arguments[0], "1")
+	testInfixExpr(t, callExp.Arguments[1], 1, "+", 2)
+	testInfixExpr(t, callExp.Arguments[0], 2, "*", 3)
+}
+
+func TestCallExpressionParameterParsing(t *testing.T) {
+	Test := []struct {
+		input              string
+		expectedIdentifier string
+		expectedArguments  []string
+	}{
+		{
+			input:              "print();",
+			expectedIdentifier: "print",
+			expectedArguments:  []string{},
+		},
+		{
+			input:              "print();",
+			expectedIdentifier: "print",
+			expectedArguments:  []string{},
+		},
+		{
+			input:              "print();",
+			expectedIdentifier: "print",
+			expectedArguments:  []string{},
+		},
+	}
+	for _, tcase := range Test {
+		lex := lexer.New(tcase.input)
+		parser := New(lex)
+		program := parser.ParseProgram()
+		checkParserErrors(t, parser)
+		stmt := program.Statements[0].(*ast.ExpressionStatement)
+		callExpr, ok := stmt.Expression.(*ast.CallExpression)
+		if !ok {
+			t.Fatalf("stmt is not CallExpression. got=%T", stmt.Expression)
+		}
+
+		if !testIdentifier(t, callExpr.Function, tcase.expectedIdentifier) {
+			return
+		}
+
+		if len(callExpr.Arguments) != len(tcase.expectedArguments) {
+			t.Fatalf("Wrong number of Arguments. Expected=%d, got=%d",
+				len(tcase.expectedArguments), len(callExpr.Arguments))
+		}
+
+		for i, arg := range tcase.expectedArguments {
+			if callExpr.Arguments[i].String() != arg {
+				t.Errorf("argument number %d is wrong. Expected=%q, got=%q", i, arg, callExpr.Arguments[i].String())
+			}
+		}
+	}
+}
+
 func TestParsingPrefixExpr(t *testing.T) {
 	Tests := []struct {
 		inp      string
