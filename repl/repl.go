@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/Muto1907/interpreterInGo/evaluator"
 	"github.com/Muto1907/interpreterInGo/lexer"
 	"github.com/Muto1907/interpreterInGo/parser"
 )
@@ -30,8 +31,11 @@ func Start(in io.Reader, out io.Writer) {
 			printParseErrors(out, p.Errors())
 			continue
 		}
+		evaluated := evaluator.Eval(program)
+		if evaluated != nil {
+			io.WriteString(out, evaluated.Inspect()+"\n")
+		}
 
-		io.WriteString(out, program.String()+"\n")
 	}
 }
 
