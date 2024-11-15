@@ -1,12 +1,15 @@
 package object
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type ObjectType string
 
 const (
 	INTEGER_OBJ = "INTEGER"
 	BOOLEAN_OBJ = "BOOLEAN"
+	NULL_OBJ    = "NULL"
 )
 
 type Object interface {
@@ -36,4 +39,14 @@ func (b *Boolean) Type() ObjectType {
 
 func (b *Boolean) Inspect() string {
 	return fmt.Sprintf("%t", b.Value)
+}
+
+type NULL struct{}
+
+func (n *NULL) Type() ObjectType {
+	return NULL_OBJ
+}
+
+func (n *NULL) Inspect() string {
+	return "null"
 }
