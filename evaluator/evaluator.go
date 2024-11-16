@@ -33,7 +33,7 @@ func evalStatements(statements []ast.Statement) object.Object {
 	return obj
 }
 
-func nativeBooltoBooleanObject(b bool) object.Object {
+func nativeBooltoBooleanObject(b bool) *object.Boolean {
 	if b {
 		return TRUE
 	}
