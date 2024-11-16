@@ -51,6 +51,15 @@ func TestEvalBoolExpr(t *testing.T) {
 		{"1 != 1", false},
 		{"1 == 2", false},
 		{"1 != 2", true},
+		{"true == true", true},
+		{"true == false", false},
+		{"false == false", true},
+		{"false != true", true},
+		{"true != false", true},
+		{"(2 < 3) == true", true},
+		{"(2 < 3) == false", false},
+		{"(3 > 4) == true", false},
+		{"(3 > 4) == false", true},
 	}
 
 	for _, tcase := range tests {
