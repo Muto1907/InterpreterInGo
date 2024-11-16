@@ -5,6 +5,11 @@ import (
 	"github.com/Muto1907/interpreterInGo/object"
 )
 
+var (
+	TRUE  = &object.Boolean{Value: true}
+	FALSE = &object.Boolean{Value: false}
+)
+
 func Eval(node ast.Node) object.Object {
 	switch node := node.(type) {
 	case *ast.Program:
@@ -14,7 +19,7 @@ func Eval(node ast.Node) object.Object {
 	case *ast.IntegerLiteral:
 		return &object.Integer{Value: node.Value}
 	case *ast.Boolean:
-		return &object.Boolean{Value: node.Value}
+		return nativeBooltoBooleanObject(node.Value)
 	}
 	return nil
 }
@@ -26,4 +31,11 @@ func evalStatements(statements []ast.Statement) object.Object {
 		obj = Eval(stmt)
 	}
 	return obj
+}
+
+func nativeBooltoBooleanObject(b bool) object.Object {
+	if b {
+		return TRUE
+	}
+	return FALSE
 }
