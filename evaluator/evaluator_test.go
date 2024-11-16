@@ -19,6 +19,12 @@ func TestEvalIntExpr(t *testing.T) {
 		{
 			input: "1907", expectedVal: 1907,
 		},
+		{
+			input: "-3", expectedVal: -3,
+		},
+		{
+			input: "--3", expectedVal: 3,
+		},
 	}
 
 	for _, tcase := range tests {
