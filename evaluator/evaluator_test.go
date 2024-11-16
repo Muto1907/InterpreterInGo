@@ -41,12 +41,16 @@ func TestEvalBoolExpr(t *testing.T) {
 		input       string
 		expectedVal bool
 	}{
-		{
-			"true", true,
-		},
-		{
-			"false", false,
-		},
+		{"true", true},
+		{"false", false},
+		{"2 > 3", false},
+		{"3 < 5", true},
+		{"2 < 2", false},
+		{"3 > 3", false},
+		{"1 == 1", true},
+		{"1 != 1", false},
+		{"1 == 2", false},
+		{"1 != 2", true},
 	}
 
 	for _, tcase := range tests {
