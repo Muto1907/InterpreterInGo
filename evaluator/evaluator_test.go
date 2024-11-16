@@ -156,7 +156,8 @@ func testBooleanObject(t *testing.T, booleanObject object.Object, expectedbool b
 func testIntegerObject(t *testing.T, integerObject object.Object, expectedInt int64) bool {
 	res, ok := integerObject.(*object.Integer)
 	if !ok {
-		t.Fatalf("Object is not integerObject. got=%T", integerObject)
+		t.Errorf("Object is not integerObject. got=%T", integerObject)
+		return false
 	}
 	if res.Value != expectedInt {
 		t.Errorf("Unexpected Value of IntegerObject. Expected=%d, got=%d", expectedInt, res.Value)
