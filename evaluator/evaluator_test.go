@@ -119,7 +119,7 @@ func TestIfElseExpression(t *testing.T) {
 		{"if (3 < 4) { 12 }", 12},
 		{"if (3 > 4) { 12 }", nil},
 		{"if (3 > 4) { 12 } else { 22 }", 22},
-		{"if (3 < 4) { 12 } else { 22 }", 22},
+		{"if (3 < 4) { 12 } else { 22 }", 12},
 	}
 
 	for _, tcase := range tests {
