@@ -103,10 +103,33 @@ func TestReturnStatements(t *testing.T) {
 				return 7;
 			}`, 10},
 	}
-
 	for _, tcase := range tests {
 		val := testEval(tcase.input)
 		testIntegerObject(t, val, tcase.expectedVal)
+	}
+}
+func TestIfElseExpression(t *testing.T) {
+	tests := []struct {
+		input       string
+		expectedVal interface{}
+	}{
+		{"if (true) { 12 }", 12},
+		{"if (false) { 12 }", nil},
+		{"if (6) { 12 }", 12},
+		{"if (3 < 4) { 12 }", 12},
+		{"if (3 > 4) { 12 }", nil},
+		{"if (3 > 4) { 12 } else { 22 }", 22},
+		{"if (3 < 4) { 12 } else { 22 }", 22},
+	}
+
+	for _, tcase := range tests {
+		val := testEval(tcase.input)
+		integer, ok := tcase.expectedVal.(int)
+		if ok {
+			testIntegerObject(t, val, int64(integer))
+		} else {
+			testNullObject(t, val)
+		}
 	}
 }
 
@@ -137,6 +160,14 @@ func testIntegerObject(t *testing.T, integerObject object.Object, expectedInt in
 	}
 	if res.Value != expectedInt {
 		t.Errorf("Unexpected Value of IntegerObject. Expected=%d, got=%d", expectedInt, res.Value)
+		return false
+	}
+	return true
+}
+
+func testNullObject(t *testing.T, nullObject object.Object) bool {
+	if nullObject != NULL {
+		t.Errorf("Nullobject is not NULL. got=%T (%v)", nullObject, nullObject)
 		return false
 	}
 	return true
