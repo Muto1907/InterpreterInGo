@@ -28,13 +28,13 @@ func Eval(node ast.Node) object.Object {
 		left := Eval(node.Left)
 		right := Eval(node.Right)
 		return EvalInfixExpr(node.Operator, left, right)
-	case *ast.ReturnStatement:
-		val := Eval(node.ReturnValue)
-		return &object.ReturnValue{Value: val}
 	case *ast.BlockStatement:
 		return evalBlockStatement(node)
 	case *ast.IfExpression:
-		return EvalIfExpression(node)
+		return evalIfExpression(node)
+	case *ast.ReturnStatement:
+		val := Eval(node.ReturnValue)
+		return &object.ReturnValue{Value: val}
 
 	}
 
@@ -135,7 +135,7 @@ func evalIntegerInfixExpression(operator string, left, right object.Object) obje
 
 }
 
-func EvalIfExpression(ifExpression *ast.IfExpression) object.Object {
+func evalIfExpression(ifExpression *ast.IfExpression) object.Object {
 	condition := Eval(ifExpression.Condition)
 	if isTruthy(condition) {
 		return Eval(ifExpression.Then)

@@ -133,6 +133,42 @@ func TestIfElseExpression(t *testing.T) {
 	}
 }
 
+func TestErrorHandling(t *testing.T) {
+	tests := []struct {
+		Input            string
+		ExpectedErrorMsg string
+	}{
+		{"3 + false", "type mismatch: INTEGER + BOOLEAN"},
+		{"false + true", "type mismatch: BOOLEAN + INTEGER"},
+		{"3 + true; 3", "type mismatch: INTEGER + BOOLEAN"},
+		{"-false", "unknown operator: -BOOLEAN"},
+		{"false + false", "unknown operator: BOOLEAN + BOOLEAN"},
+		{"3; false + false; 3;", "unknown operator: BOOLEAN + BOOLEAN"},
+		{"if (2 > 1) {true + false;}", "unknown operator: BOOLEAN + BOOLEAN"},
+		{`
+			if (2 < 4) {
+				if (2 < 4){
+					return false * false;
+				}
+				return 3;
+			}
+		`, "unknown operator: BOOLEAN * BOOLEAN"},
+	}
+
+	for _, tcase := range tests {
+		val := testEval(tcase.Input)
+		errorObj, ok := val.(*object.Error)
+		if !ok {
+			t.Errorf("Object is not of Type Error. got=%T(%+v)", val, val)
+			continue
+		}
+
+		if errorObj.Message != tcase.ExpectedErrorMsg {
+			t.Errorf("Wrong Error message. Expected=%q, got=%q", tcase.ExpectedErrorMsg, errorObj.Message)
+		}
+	}
+}
+
 func testEval(input string) object.Object {
 	lex := lexer.New(input)
 	parser := parser.New(lex)
