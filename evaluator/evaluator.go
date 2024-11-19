@@ -32,7 +32,7 @@ func Eval(node ast.Node) object.Object {
 		val := Eval(node.ReturnValue)
 		return &object.ReturnValue{Value: val}
 	case *ast.BlockStatement:
-		return evalStatements(node.Statements)
+		return evalBlockStatement(node)
 	case *ast.IfExpression:
 		return EvalIfExpression(node)
 
@@ -157,4 +157,15 @@ func isTruthy(object object.Object) bool {
 	default:
 		return true
 	}
+}
+
+func evalBlockStatement(block *ast.BlockStatement) object.Object {
+	var obj object.Object
+	for _, stmt := range block.Statements {
+		obj := Eval(stmt)
+		if obj != nil && obj.Type() == object.RETURN_OBJ {
+			return obj
+		}
+	}
+	return obj
 }
