@@ -86,6 +86,23 @@ func TestBangOperator(t *testing.T) {
 	}
 }
 
+func TestReturnStatements(t *testing.T) {
+	tests := []struct {
+		input       string
+		expectedVal int64
+	}{
+		{"return 3", 3},
+		{"return 3; 4", 3},
+		{"return 3 + 8; 25", 11},
+		{"89; return 3 + 8; 25", 11},
+	}
+
+	for _, tcase := range tests {
+		val := testEval(tcase.input)
+		testIntegerObject(t, val, tcase.expectedVal)
+	}
+}
+
 func testEval(input string) object.Object {
 	lex := lexer.New(input)
 	parser := parser.New(lex)
