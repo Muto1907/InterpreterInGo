@@ -28,17 +28,16 @@ func Eval(node ast.Node) object.Object {
 		left := Eval(node.Left)
 		right := Eval(node.Right)
 		return EvalInfixExpr(node.Operator, left, right)
-<<<<<<< HEAD
 	case *ast.ReturnStatement:
 		val := Eval(node.ReturnValue)
 		return &object.ReturnValue{Value: val}
-=======
 	case *ast.BlockStatement:
 		return evalStatements(node.Statements)
 	case *ast.IfExpression:
 		return EvalIfExpression(node)
->>>>>>> cf01ec1 (Implement Evaluation of IfExpressions)
+
 	}
+
 	return nil
 }
 
