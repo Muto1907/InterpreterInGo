@@ -162,7 +162,7 @@ func isTruthy(object object.Object) bool {
 func evalBlockStatement(block *ast.BlockStatement) object.Object {
 	var obj object.Object
 	for _, stmt := range block.Statements {
-		obj := Eval(stmt)
+		obj = Eval(stmt)
 		if obj != nil && obj.Type() == object.RETURN_OBJ {
 			return obj
 		}
