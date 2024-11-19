@@ -139,7 +139,7 @@ func TestErrorHandling(t *testing.T) {
 		ExpectedErrorMsg string
 	}{
 		{"3 + false", "type mismatch: INTEGER + BOOLEAN"},
-		{"false + true", "type mismatch: BOOLEAN + INTEGER"},
+		{"false + true", "unknown operator: BOOLEAN + BOOLEAN"},
 		{"3 + true; 3", "type mismatch: INTEGER + BOOLEAN"},
 		{"-false", "unknown operator: -BOOLEAN"},
 		{"false + false", "unknown operator: BOOLEAN + BOOLEAN"},

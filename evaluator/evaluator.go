@@ -1,6 +1,8 @@
 package evaluator
 
 import (
+	"fmt"
+
 	"github.com/Muto1907/interpreterInGo/ast"
 	"github.com/Muto1907/interpreterInGo/object"
 )
@@ -67,7 +69,7 @@ func EvalPrefixExpr(operator string, right object.Object) object.Object {
 	case "-":
 		return evalPrefixMinusExpr(right)
 	default:
-		return NULL
+		return newError("unknown operator: %s%s", operator, right.Type())
 	}
 }
 
@@ -86,7 +88,7 @@ func evalBangOperatorExpr(obj object.Object) object.Object {
 
 func evalPrefixMinusExpr(obj object.Object) object.Object {
 	if obj.Type() != object.INTEGER_OBJ {
-		return NULL
+		return newError("unknown operator: -%s", obj.Type())
 	}
 	value := obj.(*object.Integer).Value
 	return &object.Integer{Value: -value}
@@ -100,8 +102,10 @@ func EvalInfixExpr(operator string, left, right object.Object) object.Object {
 		return nativeBooltoBooleanObject(left == right)
 	case operator == "!=":
 		return nativeBooltoBooleanObject(left != right)
+	case left.Type() != right.Type():
+		return newError("type mismatch: %s %s %s", left.Type(), operator, right.Type())
 	default:
-		return NULL
+		return newError("unknown operator: %s %s %s", left.Type(), operator, right.Type())
 	}
 }
 
@@ -120,7 +124,7 @@ func evalIntegerInfixExpression(operator string, left, right object.Object) obje
 		if rightVal.Value != 0 {
 			return &object.Integer{Value: leftVal.Value / rightVal.Value}
 		}
-		return NULL
+		return newError("zero division: %d / %d", rightVal.Value, leftVal.Value)
 	case "<":
 		return nativeBooltoBooleanObject(leftVal.Value < rightVal.Value)
 	case ">":
@@ -130,7 +134,7 @@ func evalIntegerInfixExpression(operator string, left, right object.Object) obje
 	case "!=":
 		return nativeBooltoBooleanObject(leftVal.Value != rightVal.Value)
 	default:
-		return NULL
+		return newError("unknown operator: %s %s %s", left.Type(), operator, right.Type())
 	}
 
 }
@@ -168,4 +172,8 @@ func evalBlockStatement(block *ast.BlockStatement) object.Object {
 		}
 	}
 	return obj
+}
+
+func newError(format string, a ...interface{}) *object.Error {
+	return &object.Error{Message: fmt.Sprintf(format, a...)}
 }
