@@ -153,6 +153,7 @@ func TestErrorHandling(t *testing.T) {
 				return 3;
 			}
 		`, "unknown operator: BOOLEAN * BOOLEAN"},
+		{"stuff", "identifier not found: stuff"},
 	}
 
 	for _, tcase := range tests {
@@ -166,6 +167,23 @@ func TestErrorHandling(t *testing.T) {
 		if errorObj.Message != tcase.ExpectedErrorMsg {
 			t.Errorf("Wrong Error message. Expected=%q, got=%q", tcase.ExpectedErrorMsg, errorObj.Message)
 		}
+	}
+}
+
+func TestLetStatements(t *testing.T) {
+	tests := []struct {
+		Input       string
+		ExpectedVal int64
+	}{
+		{"let x = 5; x", 5},
+		{"let x = 5 * 5; x", 25},
+		{"let x = 5; let y = x; y", 5},
+		{"let x = 5; let y = x; let z = x + y + 4; z", 14},
+	}
+
+	for _, tcase := range tests {
+		val := testEval(tcase.Input)
+		testIntegerObject(t, val, tcase.ExpectedVal)
 	}
 }
 
