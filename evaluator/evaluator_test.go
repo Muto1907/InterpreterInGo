@@ -206,6 +206,23 @@ func TestFunctionObjects(t *testing.T) {
 	}
 }
 
+func TestFunctionCall(t *testing.T) {
+	test := []struct {
+		input       string
+		expectedVal int64
+	}{
+		{"let doNothing = fnc (x){ x; }; doNothing(3)", 3},
+		{"let doNothing = fnc (x){ return x; }; doNothing(3)", 3},
+		{"let successor = fnc (x){ x + 1; }; successor(3)", 4},
+		{"let mult = fnc (x, y){ x * y; }; mult(3, 4)", 12},
+		{"let mult = fnc (x, y){ x * y; }; mult(2 * 2, mult(3, 4))", 48},
+		{"fnc (x){ x; } (3)", 3},
+	}
+	for _, tcase := range test {
+		testIntegerObject(t, testEval(tcase.input), tcase.expectedVal)
+	}
+}
+
 func testEval(input string) object.Object {
 	lex := lexer.New(input)
 	parser := parser.New(lex)
