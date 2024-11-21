@@ -1,17 +1,22 @@
 package object
 
 import (
+	"bytes"
 	"fmt"
+	"strings"
+
+	"github.com/Muto1907/interpreterInGo/ast"
 )
 
 type ObjectType string
 
 const (
-	INTEGER_OBJ = "INTEGER"
-	BOOLEAN_OBJ = "BOOLEAN"
-	NULL_OBJ    = "NULL"
-	RETURN_OBJ  = "RETURN_VALUE"
-	ERROR_OBJ   = "ERROR"
+	INTEGER_OBJ  = "INTEGER"
+	BOOLEAN_OBJ  = "BOOLEAN"
+	NULL_OBJ     = "NULL"
+	RETURN_OBJ   = "RETURN_VALUE"
+	ERROR_OBJ    = "ERROR"
+	FUNCTION_OBJ = "FUNCTION"
 )
 
 type Object interface {
@@ -94,4 +99,29 @@ func (er *Error) Type() ObjectType {
 
 func (er *Error) Inspect() string {
 	return "ERROR: " + er.Message
+}
+
+type Function struct {
+	Params []*ast.Identifier
+	Body   *ast.BlockStatement
+	Env    *Environment
+}
+
+func (fn *Function) Type() ObjectType {
+	return FUNCTION_OBJ
+}
+
+func (fn *Function) Inspect() string {
+	var output bytes.Buffer
+	parameters := []string{}
+	for _, param := range fn.Params {
+		parameters = append(parameters, param.String())
+	}
+
+	output.WriteString("fnc(")
+	output.WriteString(strings.Join(parameters, ", "))
+	output.WriteString(") {\n")
+	output.WriteString(fn.Body.String())
+	output.WriteString("\n}")
+	return output.String()
 }
