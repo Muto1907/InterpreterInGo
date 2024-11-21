@@ -26,11 +26,12 @@ type Object interface {
 
 type Environment struct {
 	state map[string]Object
+	outer *Environment
 }
 
 func NewEnvironment() *Environment {
 	st := make(map[string]Object)
-	return &Environment{state: st}
+	return &Environment{state: st, outer: nil}
 }
 
 func (env *Environment) Set(ident string, val Object) Object {
@@ -40,7 +41,16 @@ func (env *Environment) Set(ident string, val Object) Object {
 
 func (env *Environment) Get(ident string) (Object, bool) {
 	val, ok := env.state[ident]
+	if !ok && env.outer != nil {
+		val, ok = env.outer.Get(ident)
+	}
 	return val, ok
+}
+
+func NeweEnclosedEnvironment(outer *Environment) *Environment {
+	env := NewEnvironment()
+	env.outer = outer
+	return env
 }
 
 type Integer struct {
