@@ -187,6 +187,25 @@ func TestLetStatements(t *testing.T) {
 	}
 }
 
+func TestFunctionObjects(t *testing.T) {
+	input := "fnc(x) { x * 3; };"
+	val := testEval(input)
+	fnc, ok := val.(*object.Function)
+	if !ok {
+		t.Fatalf("Unexpected Object Type. Expected Function got=%T(%v)", val, val)
+	}
+	if len(fnc.Params) != 1 {
+		t.Fatalf("Incorrect number of Parameters. Expected 1 got = %d", len(fnc.Params))
+	}
+	if fnc.Params[0].String() != "x" {
+		t.Fatalf("incorrect Parameter Identifier. Expected = x got = %s", fnc.Params[0].String())
+	}
+	expectedBody := "(x * 3)"
+	if fnc.Body.String() != expectedBody {
+		t.Fatalf("Incorrect body. Expected= %s. got= %s", expectedBody, fnc.Body.String())
+	}
+}
+
 func testEval(input string) object.Object {
 	lex := lexer.New(input)
 	parser := parser.New(lex)
