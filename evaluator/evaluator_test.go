@@ -36,6 +36,19 @@ func TestEvalIntExpr(t *testing.T) {
 	}
 }
 
+func TestEvalStringExpr(t *testing.T) {
+	input := `"whats up"`
+	val := testEval(input)
+	str, ok := val.(*object.String)
+	if !ok {
+		t.Fatalf("Wrong Object Type. Expected String got=%T(%v)", val, val)
+	}
+
+	if str.Value != "whats up" {
+		t.Fatalf("Wrong StringValue. Expected whats up got=%q", str.Value)
+	}
+}
+
 func TestEvalBoolExpr(t *testing.T) {
 	tests := []struct {
 		input       string
