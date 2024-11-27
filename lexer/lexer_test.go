@@ -9,7 +9,7 @@ import (
 func TestNextToken(t *testing.T) {
 	input := `let five = 5;
 	let ten = 10;
-	let add = func(x, y) {
+	let add = fnc(x, y) {
 	x + y;
 	};
 	let result = add(five, ten);
@@ -24,6 +24,9 @@ func TestNextToken(t *testing.T) {
 
 10 == 10;
 10 != 9;
+let name = "hello";
+"whatever"
+"what ever"
 `
 
 	tests := []struct {
@@ -103,6 +106,13 @@ func TestNextToken(t *testing.T) {
 		{token.NOT_EQ, "!="},
 		{token.INT, "9"},
 		{token.SEMICOLON, ";"},
+		{token.LET, "let"},
+		{token.IDENT, "name"},
+		{token.ASSIGN, "="},
+		{token.STRING, "hello"},
+		{token.SEMICOLON, ";"},
+		{token.STRING, "whatever"},
+		{token.STRING, "what ever"},
 		{token.EOF, ""},
 	}
 
