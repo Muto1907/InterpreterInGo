@@ -142,6 +142,29 @@ func TestIntegerExpr(t *testing.T) {
 
 }
 
+func TestStringExpr(t *testing.T) {
+	input := `"whats up";`
+
+	lex := lexer.New(input)
+	parser := New(lex)
+	program := parser.ParseProgram()
+	checkParserErrors(t, parser)
+	if len(program.Statements) != 1 {
+		t.Fatalf("Number of ProgramStatements != 1. got=%d", len(program.Statements))
+	}
+	strStmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("Statement is not Expressionstatement. got=%T(%v)", program.Statements[0], program.Statements[0])
+	}
+	strLit, ok := strStmt.Expression.(*ast.StringLiteral)
+	if !ok {
+		t.Fatalf("Expression isn't string literal. got=%T(%v)", strStmt, strStmt)
+	}
+	if strLit.Value != "whats up" {
+		t.Fatalf("Wrong String value. Expected= whats up, got=%q", strLit.Value)
+	}
+}
+
 func TestBooleanExpression(t *testing.T) {
 	Tests := []struct {
 		inp          string
