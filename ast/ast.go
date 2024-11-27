@@ -126,6 +126,20 @@ func (inte *IntegerLiteral) String() string {
 	return inte.Token.Literal
 }
 
+type StringLiteral struct {
+	Token token.Token
+	Value string
+}
+
+func (str *StringLiteral) expressionNode() {}
+func (str *StringLiteral) TokenLiteral() string {
+	return str.Token.Literal
+}
+
+func (str *StringLiteral) String() string {
+	return str.Token.Literal
+}
+
 type PrefixExpression struct {
 	Token    token.Token
 	Operator string
