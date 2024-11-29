@@ -50,7 +50,7 @@ func TestEvalStringExpr(t *testing.T) {
 }
 
 func TestEvalConcatenation(t *testing.T) {
-	input := `"Hey" + " " "what's" + "up";`
+	input := `"Hey" + " " + "what's" + " " + "up";`
 	val := testEval(input)
 	str, ok := val.(*object.String)
 	if !ok {
