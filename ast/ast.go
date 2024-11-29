@@ -280,6 +280,9 @@ type ArrayLiteral struct {
 
 func (al *ArrayLiteral) expressionNode() {}
 func (al *ArrayLiteral) TokenLiteral() string {
+	return al.Token.Literal
+}
+func (al *ArrayLiteral) String() string {
 	var output bytes.Buffer
 	var elements []string
 	for _, arg := range al.Elements {
