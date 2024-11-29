@@ -12,13 +12,6 @@ var (
 	FALSE = &object.Boolean{Value: false}
 	NULL  = &object.NULL{}
 )
-var builtIns = map[string]*object.BuiltIn{
-	"len": &object.BuiltIn{
-		Fnc: func(args ...object.Object) object.Object {
-			return NULL
-		},
-	},
-}
 
 func Eval(node ast.Node, env *object.Environment) object.Object {
 	switch node := node.(type) {
