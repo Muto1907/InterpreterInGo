@@ -153,7 +153,7 @@ func (fn *Function) Inspect() string {
 type BuiltInFunction func(args ...Object) Object
 
 type BuiltIn struct {
-	fnc BuiltInFunction
+	Fnc BuiltInFunction
 }
 
 func (bi *BuiltIn) Type() ObjectType { return BUILTIN_OBJ }

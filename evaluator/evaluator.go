@@ -12,6 +12,13 @@ var (
 	FALSE = &object.Boolean{Value: false}
 	NULL  = &object.NULL{}
 )
+var builtIns = map[string]*object.BuiltIn{
+	"len": &object.BuiltIn{
+		Fnc: func(args ...object.Object) object.Object {
+			return NULL
+		},
+	},
+}
 
 func Eval(node ast.Node, env *object.Environment) object.Object {
 	switch node := node.(type) {
@@ -244,10 +251,14 @@ func isError(obj object.Object) bool {
 
 func evalIdentifier(node *ast.Identifier, env *object.Environment) object.Object {
 	val, ok := env.Get(node.Value)
-	if !ok {
-		return newError("identifier not found: %s", node.Value)
+	if ok {
+		return val
 	}
-	return val
+	if builtin, ok := builtIns[node.Value]; ok {
+		return builtin
+	}
+	return newError("identifier not found: %s", node.Value)
+
 }
 
 func evalExpressions(expressions []ast.Expression, env *object.Environment) []object.Object {
