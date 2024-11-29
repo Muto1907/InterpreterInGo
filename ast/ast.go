@@ -272,3 +272,21 @@ func (ce *CallExpression) String() string {
 	output.WriteString(")")
 	return output.String()
 }
+
+type ArrayLiteral struct {
+	Token    token.Token
+	Elements []Expression
+}
+
+func (al *ArrayLiteral) expressionNode() {}
+func (al *ArrayLiteral) TokenLiteral() string {
+	var output bytes.Buffer
+	var elements []string
+	for _, arg := range al.Elements {
+		elements = append(elements, arg.String())
+	}
+	output.WriteString("[")
+	output.WriteString(strings.Join(elements, ", "))
+	output.WriteString("]")
+	return output.String()
+}
