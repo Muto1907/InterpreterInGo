@@ -250,6 +250,36 @@ func TestFunctionCall(t *testing.T) {
 	}
 }
 
+func TestBuiltInFunction(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected interface{}
+	}{
+		{`len("hi");`, 2},
+		{`len("");`, 0},
+		{`len("Hi what's up");`, 12},
+		{`len(4);`, "invalid argument for `len` got INTEGER"},
+		{`len("Hey", "Ho")`, "invalid number of arguments for `len need=1 got=2"},
+	}
+	for _, tcase := range tests {
+		val := testEval(tcase.input)
+
+		switch expect := tcase.expected.(type) {
+		case int:
+			testIntegerObject(t, val, int64(expect))
+		case string:
+			err, ok := val.(*object.Error)
+			if !ok {
+				t.Errorf("Object is not Error got %T(%v)", val, val)
+				continue
+			}
+			if err.Message != expect {
+				t.Errorf("Unexpected ErrorMessage expected=%s got=%s", expect, err.Message)
+			}
+		}
+	}
+}
+
 func testEval(input string) object.Object {
 	lex := lexer.New(input)
 	parser := parser.New(lex)
