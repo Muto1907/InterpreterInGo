@@ -345,30 +345,8 @@ func (parser *Parser) parseFunctionParameters() []*ast.Identifier {
 
 func (parser *Parser) parseCallExpression(function ast.Expression) ast.Expression {
 	expr := &ast.CallExpression{Token: parser.currToken, Function: function}
-	expr.Arguments = parser.parseCallArguments()
+	expr.Arguments = parser.parseExpressionList(token.PARENR)
 	return expr
-}
-
-func (parser *Parser) parseCallArguments() []ast.Expression {
-	args := []ast.Expression{}
-
-	if parser.peekTokenIs(token.PARENR) {
-		parser.nextToken()
-		return args
-	}
-	parser.nextToken()
-	args = append(args, parser.parseExpression(LOWEST))
-
-	for parser.peekTokenIs(token.COMMA) {
-		parser.nextToken()
-		parser.nextToken()
-		args = append(args, parser.parseExpression(LOWEST))
-	}
-
-	if !parser.expectPeek(token.PARENR) {
-		return nil
-	}
-	return args
 }
 
 func (parser *Parser) parsePrefixExpression() ast.Expression {
