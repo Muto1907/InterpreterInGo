@@ -532,6 +532,51 @@ func TestParsingInfixExpr(t *testing.T) {
 	}
 }
 
+func TestArrayLiteralParsing(t *testing.T) {
+	input := `[1, 3, 5, 7 * 9, 25 - 5]`
+
+	lex := lexer.New(input)
+	parser := New(lex)
+	program := parser.ParseProgram()
+	checkParserErrors(t, parser)
+
+	stmt, _ := program.Statements[0].(*ast.ExpressionStatement)
+	arr, ok := stmt.Expression.(*ast.ArrayLiteral)
+	if !ok {
+		t.Fatalf("Expression is not ArrayLiteral got=%T", stmt.Expression)
+	}
+
+	if len(arr.Elements) != 5 {
+		t.Fatalf("wron number of elements for arr. Expected 5 got=%d", len(arr.Elements))
+	}
+
+	testIntegerLiteral(t, arr.Elements[0], 1)
+	testIntegerLiteral(t, arr.Elements[1], 3)
+	testIntegerLiteral(t, arr.Elements[2], 5)
+	testInfixExpr(t, arr.Elements[3], 7, "*", 9)
+	testInfixExpr(t, arr.Elements[4], 25, "-", 5)
+}
+
+func TestEmptyArrayLiteralParsing(t *testing.T) {
+	input := `[]`
+
+	lex := lexer.New(input)
+	parser := New(lex)
+	program := parser.ParseProgram()
+	checkParserErrors(t, parser)
+
+	stmt, _ := program.Statements[0].(*ast.ExpressionStatement)
+	arr, ok := stmt.Expression.(*ast.ArrayLiteral)
+	if !ok {
+		t.Fatalf("Expression is not ArrayLiteral got=%T", stmt.Expression)
+	}
+
+	if len(arr.Elements) != 0 {
+		t.Fatalf("wron number of elements for arr. Expected 0 got=%d", len(arr.Elements))
+	}
+
+}
+
 func TestPrecedenceParsing(t *testing.T) {
 	test := []struct {
 		inp   string

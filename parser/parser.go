@@ -66,6 +66,7 @@ func New(lex *lexer.Lexer) *Parser {
 	parser.addPrefixFnc(token.PARENL, parser.ParseGroupedExpr)
 	parser.addPrefixFnc(token.IF, parser.parseIfExpression)
 	parser.addPrefixFnc(token.FUNCTION, parser.parseFunctionLiteral)
+	parser.addPrefixFnc(token.BRACKETL, parser.parseArrayLiteral)
 	parser.addInfixFnc(token.PARENL, parser.parseCallExpression)
 	parser.nextToken()
 	parser.nextToken()
@@ -218,6 +219,31 @@ func (parser *Parser) parseIntegerLiteral() ast.Expression {
 func (parser *Parser) parseStringLiteral() ast.Expression {
 	str := &ast.StringLiteral{Token: parser.currToken, Value: parser.currToken.Literal}
 	return str
+}
+
+func (parser *Parser) parseArrayLiteral() ast.Expression {
+	arr := &ast.ArrayLiteral{Token: parser.currToken}
+	arr.Elements = parser.parseExpressionList(token.BRACKETR)
+	return arr
+}
+
+func (parser *Parser) parseExpressionList(tok token.TokenType) []ast.Expression {
+	res := []ast.Expression{}
+	if parser.peekTokenIs(tok) {
+		parser.nextToken()
+		return res
+	}
+	parser.nextToken()
+	res = append(res, parser.parseExpression(LOWEST))
+	for parser.peekTokenIs(token.COMMA) {
+		parser.nextToken()
+		parser.nextToken()
+		res = append(res, parser.parseExpression(LOWEST))
+	}
+	if !parser.expectPeek(tok) {
+		return nil
+	}
+	return res
 }
 
 func (parser *Parser) parseBoolean() ast.Expression {
