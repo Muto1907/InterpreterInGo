@@ -49,6 +49,19 @@ func TestEvalStringExpr(t *testing.T) {
 	}
 }
 
+func TestEvalConcatenation(t *testing.T) {
+	input := `"Hey" + " " "what's" + "up";`
+	val := testEval(input)
+	str, ok := val.(*object.String)
+	if !ok {
+		t.Fatalf("Wrong Object Type. Expected String got=%T(%v)", val, val)
+	}
+	if str.Value != "Hey what's up" {
+		t.Fatalf("Wrong String expected=%s got=%s", "Hey what's up", str.Value)
+	}
+
+}
+
 func TestEvalBoolExpr(t *testing.T) {
 	tests := []struct {
 		input       string
@@ -167,6 +180,7 @@ func TestErrorHandling(t *testing.T) {
 			}
 		`, "unknown operator: BOOLEAN * BOOLEAN"},
 		{"stuff", "identifier not found: stuff"},
+		{`"Hi " - "you`, "unknown operator: STRING - STRING"},
 	}
 
 	for _, tcase := range tests {
