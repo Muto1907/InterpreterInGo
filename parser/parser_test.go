@@ -577,7 +577,7 @@ func TestEmptyArrayLiteralParsing(t *testing.T) {
 
 }
 
-func TestIdexExpressionParsing(t *testing.T) {
+func TestIndexExpressionParsing(t *testing.T) {
 	input := `arr [8 + 2]`
 	lex := lexer.New(input)
 	parser := New(lex)
@@ -698,6 +698,14 @@ func TestPrecedenceParsing(t *testing.T) {
 		{
 			"print(g + f + b * e / f + g)",
 			"print((((g + f) + ((b * e) / f)) + g))",
+		},
+		{
+			"g * [1, 4, 5, 6, 8] [3 + 2] * f",
+			"((g * ([1, 4, 5, 6, 8] [(3 + 2)])) * f)",
+		},
+		{
+			"print(3 * g[5], f[1], 9 * [3, 5] [1])",
+			"print((3 * (g[5])), (f[1]), (9 * ([3, 5] [1])))",
 		},
 	}
 
