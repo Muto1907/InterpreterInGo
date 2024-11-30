@@ -280,6 +280,23 @@ func TestBuiltInFunction(t *testing.T) {
 	}
 }
 
+func TestArrayEval(t *testing.T) {
+	input := "[1, 3 + 6, 0 * 5, 7 - 0]"
+	val := testEval(input)
+	arr, ok := val.(*object.Array)
+	if !ok {
+		t.Errorf("Object is not Array got=%T(%v)", val, val)
+	}
+	if len(arr.Elements) != 4 {
+		t.Errorf("Array Length not equal 4. got = %d", len(arr.Elements))
+	}
+	testIntegerObject(t, arr.Elements[0], 1)
+	testIntegerObject(t, arr.Elements[1], 9)
+	testIntegerObject(t, arr.Elements[2], 0)
+	testIntegerObject(t, arr.Elements[3], 7)
+
+}
+
 func testEval(input string) object.Object {
 	lex := lexer.New(input)
 	parser := parser.New(lex)
