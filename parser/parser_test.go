@@ -577,6 +577,26 @@ func TestEmptyArrayLiteralParsing(t *testing.T) {
 
 }
 
+func TestIdexExpressionParsing(t *testing.T) {
+	input := `arr [8 + 2]`
+	lex := lexer.New(input)
+	parser := New(lex)
+	program := parser.ParseProgram()
+	checkParserErrors(t, parser)
+	stmt, _ := program.Statements[0].(*ast.ExpressionStatement)
+	idexp, ok := stmt.Expression.(*ast.IndexExpression)
+	if !ok {
+		t.Fatalf("Wrong Expressiontype expected Indexexpresion got %T", stmt.Expression)
+	}
+	if !testIdentifier(t, idexp.Left, "arr") {
+		return
+	}
+	if !testInfixExpr(t, idexp.Index, 8, "+", 2) {
+		return
+	}
+
+}
+
 func TestPrecedenceParsing(t *testing.T) {
 	test := []struct {
 		inp   string
