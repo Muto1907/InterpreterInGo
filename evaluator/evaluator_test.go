@@ -297,6 +297,64 @@ func TestArrayEval(t *testing.T) {
 
 }
 
+func TestArrayIndexExpr(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected interface{}
+	}{
+		{
+			"[5, 9, 4][0]",
+			5,
+		},
+		{
+			"[4, 3, 8][1]",
+			3,
+		},
+		{
+			"[13, 25, 90][2]",
+			90,
+		},
+		{
+			"let m = 0; [3][i];",
+			3,
+		},
+		{
+			"[1, 5, 8][2 + 1];",
+			8,
+		},
+		{
+			"let arr = [1, 4, 8]; arr[2];",
+			8,
+		},
+		{
+			"let arr = [12, 25, 31]; arr[0] + arr[1] + arr[2];",
+			68,
+		},
+		{
+			"let arr = [12, 2, 13]; let i = myArray[1]; myArray[i]",
+			13,
+		},
+		{
+			"[11, 23, 53][3]",
+			nil,
+		},
+		{
+			"[11, 23, 53][-1]",
+			nil,
+		},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		integer, ok := tt.expected.(int)
+		if ok {
+			testIntegerObject(t, evaluated, int64(integer))
+		} else {
+			testNullObject(t, evaluated)
+		}
+	}
+}
+
 func testEval(input string) object.Object {
 	lex := lexer.New(input)
 	parser := parser.New(lex)
