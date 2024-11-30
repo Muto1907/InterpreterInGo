@@ -315,11 +315,11 @@ func TestArrayIndexExpr(t *testing.T) {
 			90,
 		},
 		{
-			"let m = 0; [3][i];",
+			"let m = 0; [3][m];",
 			3,
 		},
 		{
-			"[1, 5, 8][2 + 1];",
+			"[1, 5, 8][1 + 1];",
 			8,
 		},
 		{
@@ -331,7 +331,7 @@ func TestArrayIndexExpr(t *testing.T) {
 			68,
 		},
 		{
-			"let arr = [12, 2, 13]; let i = myArray[1]; myArray[i]",
+			"let arr = [12, 2, 13]; let i = arr[1]; arr[i]",
 			13,
 		},
 		{
