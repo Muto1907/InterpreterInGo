@@ -38,7 +38,7 @@ const (
 	PARENR   = ")"
 	BRACEL   = "{"
 	BRACER   = "}"
-	BRACKETL = "]"
+	BRACKETL = "["
 	BRACKETR = "]"
 
 	// Keywords
