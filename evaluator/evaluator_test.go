@@ -260,6 +260,16 @@ func TestBuiltInFunction(t *testing.T) {
 		{`len("Hi what's up");`, 12},
 		{`len(4);`, "invalid argument for `len` got INTEGER"},
 		{`len("Hey", "Ho")`, "invalid number of arguments for `len need=1 got=2"},
+		{`len([3, 6, 9])`, 3},
+		{`len([])`, 0},
+		{`head([14,12,32])`, 14},
+		{`head([])`, nil},
+		{`last([14,12,32])`, 32},
+		{`last([])`, nil},
+		{`tail([14,12,32])`, []int{12, 32}},
+		{`tail([])`, nil},
+		{`push([], 3)`, []int{3}},
+		{`push(3, 3)`, "Invalid argument for push expected ARRAY, got INTEGER"},
 	}
 	for _, tcase := range tests {
 		val := testEval(tcase.input)
