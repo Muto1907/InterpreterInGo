@@ -125,6 +125,7 @@ let name = "hello";
 		{token.STRING, "name"},
 		{token.COLON, ":"},
 		{token.STRING, "Mahmut"},
+		{token.BRACER, "}"},
 		{token.EOF, ""},
 	}
 
