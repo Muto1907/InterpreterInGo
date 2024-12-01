@@ -28,6 +28,7 @@ let name = "hello";
 "whatever"
 "what ever"
 [5, 3];
+{"name": "Mahmut"}
 `
 
 	tests := []struct {
@@ -120,6 +121,10 @@ let name = "hello";
 		{token.INT, "3"},
 		{token.BRACKETR, "]"},
 		{token.SEMICOLON, ";"},
+		{token.BRACEL, "{"},
+		{token.STRING, "name"},
+		{token.COLON, ":"},
+		{token.STRING, "Mahmut"},
 		{token.EOF, ""},
 	}
 
