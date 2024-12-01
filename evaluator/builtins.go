@@ -52,4 +52,21 @@ var builtIns = map[string]*object.BuiltIn{
 			}
 		},
 	},
+	"tail": &object.BuiltIn{
+		Fnc: func(args ...object.Object) object.Object {
+			if len(args) != 1 {
+				return newError("invalid number of arguments for `tail` need=%d got=%d", 1, len(args))
+			}
+			switch arg := args[0].(type) {
+			case *object.Array:
+				length := len(arg.Elements) - 1
+				if length > 0 {
+					return &object.Array{Elements: arg.Elements[1:]}
+				}
+				return NULL
+			default:
+				return newError("invalid argument for `tail` expected ARRAY got %s", arg.Type())
+			}
+		},
+	},
 }
