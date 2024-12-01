@@ -321,12 +321,12 @@ type HashLiteral struct {
 
 func (hsh *HashLiteral) expressionNode() {}
 func (hsh *HashLiteral) TokenLiteral() string {
-	return hsh.token.Literal
+	return hsh.Token.Literal
 }
 func (hsh *HashLiteral) String() string {
 	var output bytes.Buffer
 	pairs := []string{}
-	for key, value := range hsh.pairs {
+	for key, value := range hsh.Pairs {
 		pairs = append(pairs, key.String()+": "+value.String())
 	}
 	output.WriteString("{")

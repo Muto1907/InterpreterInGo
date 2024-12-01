@@ -597,6 +597,176 @@ func TestIndexExpressionParsing(t *testing.T) {
 
 }
 
+func TestEmptyHashLiteralParsing(t *testing.T) {
+	input := "{"
+
+	lex := lexer.New(input)
+	parser := New(lex)
+	program := parser.ParseProgram()
+	checkParserErrors(t, parser)
+	stmt, _ := program.Statements[0].(*ast.ExpressionStatement)
+	hsh, ok := stmt.Expression.(*ast.HashLiteral)
+	if !ok {
+		t.Fatalf("Expression is not Hasliteral got=%T", stmt.Expression)
+	}
+	if len(hsh.Pairs) != 0 {
+		t.Errorf("Incorrect length of Hash.pairs expected 0 got=%d", len(hsh.Pairs))
+	}
+}
+
+func TestHashLiteralParsingStringKeys(t *testing.T) {
+	input := `{"age": 23, "year": 2024, "month": 12}`
+
+	lex := lexer.New(input)
+	parser := New(lex)
+	program := parser.ParseProgram()
+	checkParserErrors(t, parser)
+
+	stmt, _ := program.Statements[0].(*ast.ExpressionStatement)
+	hsh, ok := stmt.Expression.(*ast.HashLiteral)
+	if !ok {
+		t.Fatalf("Expression is not Hasliteral got=%T", stmt.Expression)
+	}
+
+	expected := map[string]int64{
+		"age":   23,
+		"year":  2024,
+		"month": 12,
+	}
+
+	if len(hsh.Pairs) != len(expected) {
+		t.Errorf("Incorrect length of Hash.pairs expected %d got=%d", len(expected), len(hsh.Pairs))
+	}
+
+	for k, v := range hsh.Pairs {
+		key, ok := k.(*ast.StringLiteral)
+		if !ok {
+			t.Errorf("Wrong key Type. Expected string got=%T", k)
+			continue
+		}
+
+		expectedVal := expected[key.String()]
+		testIntegerLiteral(t, v, expectedVal)
+	}
+}
+
+func TestHashLiteralParsingBooleanKeys(t *testing.T) {
+	input := `{true: 1, false: 0}`
+
+	lex := lexer.New(input)
+	parser := New(lex)
+	program := parser.ParseProgram()
+	checkParserErrors(t, parser)
+
+	stmt, _ := program.Statements[0].(*ast.ExpressionStatement)
+	hsh, ok := stmt.Expression.(*ast.HashLiteral)
+	if !ok {
+		t.Fatalf("Expression is not Hasliteral got=%T", stmt.Expression)
+	}
+
+	expected := map[string]int64{
+		"true":  1,
+		"false": 0,
+	}
+
+	if len(hsh.Pairs) != len(expected) {
+		t.Errorf("Incorrect length of Hash.pairs expected %d got=%d", len(expected), len(hsh.Pairs))
+	}
+
+	for k, v := range hsh.Pairs {
+		key, ok := k.(*ast.Boolean)
+		if !ok {
+			t.Errorf("Wrong key Type. Expected Boolean got=%T", k)
+			continue
+		}
+
+		expectedVal := expected[key.String()]
+		testIntegerLiteral(t, v, expectedVal)
+	}
+}
+
+func TestHashLiteralParsingIntegerKeys(t *testing.T) {
+	input := `{1: 1, 2: 2, 3: 3}`
+
+	lex := lexer.New(input)
+	parser := New(lex)
+	program := parser.ParseProgram()
+	checkParserErrors(t, parser)
+
+	stmt, _ := program.Statements[0].(*ast.ExpressionStatement)
+	hsh, ok := stmt.Expression.(*ast.HashLiteral)
+	if !ok {
+		t.Fatalf("Expression is not Hasliteral got=%T", stmt.Expression)
+	}
+
+	expected := map[string]int64{
+		"1": 1,
+		"2": 2,
+		"3": 2,
+	}
+
+	if len(hsh.Pairs) != len(expected) {
+		t.Errorf("Incorrect length of Hash.pairs expected %d got=%d", len(expected), len(hsh.Pairs))
+	}
+
+	for k, v := range hsh.Pairs {
+		key, ok := k.(*ast.IntegerLiteral)
+		if !ok {
+			t.Errorf("Wrong key Type. Expected Integer got=%T", k)
+			continue
+		}
+
+		expectedVal := expected[key.String()]
+		testIntegerLiteral(t, v, expectedVal)
+	}
+}
+
+func TestHashLiteralParsingExpressionValues(t *testing.T) {
+	input := `{"first": 1 + 2, "second": 2 * 3, "third": 3 - 8}`
+
+	lex := lexer.New(input)
+	parser := New(lex)
+	program := parser.ParseProgram()
+	checkParserErrors(t, parser)
+
+	stmt, _ := program.Statements[0].(*ast.ExpressionStatement)
+	hsh, ok := stmt.Expression.(*ast.HashLiteral)
+	if !ok {
+		t.Fatalf("Expression is not Hasliteral got=%T", stmt.Expression)
+	}
+
+	if len(hsh.Pairs) != 3 {
+		t.Errorf("Incorrect length of Hash.pairs expected %d got=%d", 3, len(hsh.Pairs))
+	}
+
+	expected := map[string]func(ast.Expression){
+		"first": func(exp ast.Expression) {
+			testInfixExpr(t, exp, 1, "+", 2)
+		},
+		"second": func(exp ast.Expression) {
+			testInfixExpr(t, exp, 2, "*", 3)
+		},
+		"third": func(exp ast.Expression) {
+			testInfixExpr(t, exp, 3, "-", 8)
+		},
+	}
+
+	for k, v := range hsh.Pairs {
+		key, ok := k.(*ast.StringLiteral)
+		if !ok {
+			t.Errorf("Wrong key Type. Expected String got=%T", k)
+			continue
+		}
+
+		test, ok := expected[key.String()]
+		if !ok {
+			t.Errorf("Couldnt find test Function for key %q", key.String())
+			continue
+		}
+		test(v)
+	}
+}
+
 func TestPrecedenceParsing(t *testing.T) {
 	test := []struct {
 		inp   string
