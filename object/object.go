@@ -50,7 +50,7 @@ func (env *Environment) Get(ident string) (Object, bool) {
 	return val, ok
 }
 
-func NeweEnclosedEnvironment(outer *Environment) *Environment {
+func NewEnclosedEnvironment(outer *Environment) *Environment {
 	env := NewEnvironment()
 	env.outer = outer
 	return env

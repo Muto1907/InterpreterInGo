@@ -298,7 +298,7 @@ func callFunction(fnc object.Object, args []object.Object) object.Object {
 }
 
 func extendFunctionEnvironment(fnc *object.Function, args []object.Object) *object.Environment {
-	env := object.NeweEnclosedEnvironment(fnc.Env)
+	env := object.NewEnclosedEnvironment(fnc.Env)
 	for paramId, param := range fnc.Params {
 		env.Set(param.Value, args[paramId])
 	}
