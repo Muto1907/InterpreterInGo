@@ -20,4 +20,21 @@ var builtIns = map[string]*object.BuiltIn{
 			}
 		},
 	},
+	"head": &object.BuiltIn{
+		Fnc: func(args ...object.Object) object.Object {
+			if len(args) != 1 {
+				return newError("invalid number of arguments for `head need=%d got=%d", 1, len(args))
+			}
+			switch arg := args[0].(type) {
+			case *object.Array:
+				if len(arg.Elements) > 0 {
+					return arg.Elements[0]
+				}
+				return NULL
+			default:
+				return newError("invalid argument for `head` expected ARRAY got %s", arg.Type())
+			}
+
+		},
+	},
 }
