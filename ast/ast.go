@@ -315,8 +315,8 @@ func (ie *IndexExpression) String() string {
 }
 
 type HashLiteral struct {
-	token token.Token
-	pairs map[Expression]Expression
+	Token token.Token
+	Pairs map[Expression]Expression
 }
 
 func (hsh *HashLiteral) expressionNode() {}
