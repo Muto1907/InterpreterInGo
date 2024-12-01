@@ -59,7 +59,7 @@ var builtIns = map[string]*object.BuiltIn{
 			}
 			switch arg := args[0].(type) {
 			case *object.Array:
-				length := len(arg.Elements) - 1
+				length := len(arg.Elements)
 				if length > 0 {
 					return &object.Array{Elements: arg.Elements[1:]}
 				}
