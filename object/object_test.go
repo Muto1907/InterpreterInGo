@@ -8,10 +8,10 @@ func TestStringHashKey(t *testing.T) {
 	other := &String{Value: "other"}
 	other2 := &String{Value: "other"}
 
-	if hi.HashKey() != hi2.Hashkey() {
+	if hi.HashKey() != hi2.HashKey() {
 		t.Errorf("Different Hashkey on same-content-strings")
 	}
-	if other.HashKey() != other.Hashkey() {
+	if other.HashKey() != other2.HashKey() {
 		t.Errorf("Different Hashkey on same-content-strings")
 	}
 	if other.HashKey() == hi.HashKey() {

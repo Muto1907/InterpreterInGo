@@ -3,6 +3,7 @@ package object
 import (
 	"bytes"
 	"fmt"
+	"hash/fnv"
 	"strings"
 
 	"github.com/Muto1907/interpreterInGo/ast"
@@ -20,6 +21,7 @@ const (
 	STRING_OBJ   = "STRING"
 	BUILTIN_OBJ  = "BUILTIN"
 	ARRAY_OBJ    = "ARRAY"
+	HASH_OBJ     = "HASH"
 )
 
 type Object interface {
@@ -56,6 +58,39 @@ func NewEnclosedEnvironment(outer *Environment) *Environment {
 	return env
 }
 
+type Hashable interface {
+	Hashkey() HashKey
+}
+type HashKey struct {
+	Type  ObjectType
+	Value uint64
+}
+
+type HashPair struct {
+	Key   Object
+	Value Object
+}
+
+type Hash struct {
+	Pairs map[HashKey]HashPair
+}
+
+func (hash *Hash) Type() ObjectType {
+	return HASH_OBJ
+}
+
+func (hash *Hash) Inspect() string {
+	var output bytes.Buffer
+	pairs := []string{}
+	for _, pair := range hash.Pairs {
+		pairs = append(pairs, pair.Key.Inspect()+": "+pair.Value.Inspect())
+	}
+	output.WriteString("{")
+	output.WriteString(strings.Join(pairs, ", "))
+	output.WriteString("}")
+	return output.String()
+}
+
 type Integer struct {
 	Value int64
 }
@@ -66,6 +101,10 @@ func (i *Integer) Type() ObjectType {
 
 func (i *Integer) Inspect() string {
 	return fmt.Sprintf("%d", i.Value)
+}
+
+func (i *Integer) HashKey() HashKey {
+	return HashKey{Type: i.Type(), Value: uint64(i.Value)}
 }
 
 type String struct {
@@ -80,6 +119,12 @@ func (str *String) Inspect() string {
 	return str.Value
 }
 
+func (str *String) HashKey() HashKey {
+	h := fnv.New64a()
+	h.Write([]byte(str.Value))
+	return HashKey{Type: str.Type(), Value: h.Sum64()}
+}
+
 type Boolean struct {
 	Value bool
 }
@@ -90,6 +135,14 @@ func (b *Boolean) Type() ObjectType {
 
 func (b *Boolean) Inspect() string {
 	return fmt.Sprintf("%t", b.Value)
+}
+
+func (b *Boolean) HashKey() HashKey {
+	var val uint64 = 1
+	if !b.Value {
+		val = 0
+	}
+	return HashKey{Type: b.Type(), Value: val}
 }
 
 type NULL struct{}
