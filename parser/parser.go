@@ -71,6 +71,7 @@ func New(lex *lexer.Lexer) *Parser {
 	parser.addPrefixFnc(token.BRACKETL, parser.parseArrayLiteral)
 	parser.addInfixFnc(token.PARENL, parser.parseCallExpression)
 	parser.addInfixFnc(token.BRACKETL, parser.parseIndexExpr)
+	parser.addPrefixFnc(token.BRACEL, parser.parseHashLiteral)
 
 	parser.nextToken()
 	parser.nextToken()
@@ -258,6 +259,32 @@ func (parser *Parser) parseIndexExpr(left ast.Expression) ast.Expression {
 		return nil
 	}
 	return indexExpr
+}
+
+func (parser *Parser) parseHashLiteral() ast.Expression {
+	hash := &ast.HashLiteral{Token: parser.currToken}
+	hash.Pairs = make(map[ast.Expression]ast.Expression)
+
+	for !parser.peekTokenIs(token.BRACER) {
+		parser.nextToken()
+		key := parser.parseExpression(LOWEST)
+
+		if !parser.expectPeek(token.COLON) {
+			return nil
+		}
+
+		parser.nextToken()
+		val := parser.parseExpression(LOWEST)
+		hash.Pairs[key] = val
+
+		if !parser.peekTokenIs(token.BRACER) && !parser.expectPeek(token.COMMA) {
+			return nil
+		}
+	}
+	if !parser.expectPeek(token.BRACER) {
+		return nil
+	}
+	return hash
 }
 
 func (parser *Parser) parseBoolean() ast.Expression {
