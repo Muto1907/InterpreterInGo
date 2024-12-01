@@ -69,4 +69,17 @@ var builtIns = map[string]*object.BuiltIn{
 			}
 		},
 	},
+	"push": &object.BuiltIn{
+		Fnc: func(args ...object.Object) object.Object {
+			if len(args) != 2 {
+				return newError("invalid number of arguments for `push` need=%d got=%d", 2, len(args))
+			}
+			switch arg := args[0].(type) {
+			case *object.Array:
+				return &object.Array{Elements: append(arg.Elements, args[1])}
+			default:
+				return newError("invalid argument for `push` expected ARRAY got %s", arg.Type())
+			}
+		},
+	},
 }

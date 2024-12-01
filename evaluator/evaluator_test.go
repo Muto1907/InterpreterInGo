@@ -271,7 +271,7 @@ func TestBuiltInFunction(t *testing.T) {
 		{`tail([14,12,32])`, []int{12, 32}},
 		{`tail([])`, nil},
 		{`push([], 3)`, []int{3}},
-		{`push(3, 3)`, "Invalid argument for push expected ARRAY got INTEGER"},
+		{`push(3, 3)`, "invalid argument for `push` expected ARRAY got INTEGER"},
 	}
 	for _, tcase := range tests {
 		val := testEval(tcase.input)
