@@ -598,7 +598,7 @@ func TestIndexExpressionParsing(t *testing.T) {
 }
 
 func TestEmptyHashLiteralParsing(t *testing.T) {
-	input := "{"
+	input := "{}"
 
 	lex := lexer.New(input)
 	parser := New(lex)
@@ -702,7 +702,7 @@ func TestHashLiteralParsingIntegerKeys(t *testing.T) {
 	expected := map[string]int64{
 		"1": 1,
 		"2": 2,
-		"3": 2,
+		"3": 3,
 	}
 
 	if len(hsh.Pairs) != len(expected) {
