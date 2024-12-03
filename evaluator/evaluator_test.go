@@ -370,8 +370,8 @@ func TestArrayIndexExpr(t *testing.T) {
 func TestHashLiterals(t *testing.T) {
 	input := `let hi = "hiya"
 	{
-		"age": "31 - 8",
-		"ye" + "ar": "2023 + 1",
+		"age": 31 - 8,
+		"ye" + "ar": 2023 + 1,
 		hi: 90 / 2,
 		24: 24,
 		false: 8,
