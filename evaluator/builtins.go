@@ -1,6 +1,8 @@
 package evaluator
 
 import (
+	"fmt"
+
 	"github.com/Muto1907/interpreterInGo/object"
 )
 
@@ -80,6 +82,14 @@ var builtIns = map[string]*object.BuiltIn{
 			default:
 				return newError("invalid argument for `push` expected ARRAY got %s", arg.Type())
 			}
+		},
+	},
+	"puts": &object.BuiltIn{
+		Fnc: func(args ...object.Object) object.Object {
+			for _, arg := range args {
+				fmt.Println(arg.Inspect())
+			}
+			return NULL
 		},
 	},
 }
