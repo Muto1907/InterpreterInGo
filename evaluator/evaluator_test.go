@@ -181,6 +181,10 @@ func TestErrorHandling(t *testing.T) {
 		`, "unknown operator: BOOLEAN * BOOLEAN"},
 		{"stuff", "identifier not found: stuff"},
 		{`"Hi " - "you`, "unknown operator: STRING - STRING"},
+		{
+			`{"name": "Me"}[fnc(x) { x }];`,
+			"FUNCTION can not be used as HashKey",
+		},
 	}
 
 	for _, tcase := range tests {
@@ -401,6 +405,52 @@ func TestHashLiterals(t *testing.T) {
 			t.Errorf("Missing Pair for given Key in Pairs")
 		}
 		testIntegerObject(t, pair.Value, expVal)
+	}
+}
+
+func TestHashIndexExpr(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected interface{}
+	}{
+		{
+			`{"year": 2024}["year"]`,
+			2024,
+		},
+		{
+			`{"year": 2024}["month"]`,
+			nil,
+		},
+		{
+			`let key = "year"; {"year": 2024}[key]`,
+			2024,
+		},
+		{
+			`{}["year"]`,
+			nil,
+		},
+		{
+			"{9: 9}[9]",
+			9,
+		},
+		{
+			"{true: 6}[true]",
+			6,
+		},
+		{
+			"{false: 9}[false]",
+			9,
+		},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		integer, ok := tt.expected.(int)
+		if ok {
+			testIntegerObject(t, evaluated, int64(integer))
+		} else {
+			testNullObject(t, evaluated)
+		}
 	}
 }
 
