@@ -59,7 +59,7 @@ func NewEnclosedEnvironment(outer *Environment) *Environment {
 }
 
 type Hashable interface {
-	Hashkey() HashKey
+	HashKey() HashKey
 }
 type HashKey struct {
 	Type  ObjectType
