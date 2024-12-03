@@ -367,6 +367,43 @@ func TestArrayIndexExpr(t *testing.T) {
 	}
 }
 
+func TestHashLiterals(t *testing.T) {
+	input := `let hi = "hiya"
+	{
+		"age": "31 - 8",
+		"ye" + "ar": "2023 + 1",
+		hi: 90 / 2,
+		24: 24,
+		false: 8,
+		!false: 23
+	}`
+	val := testEval(input)
+	hash, ok := val.(*object.Hash)
+	if !ok {
+		t.Fatalf("Wrong Object Type expected Hash got=%T (%v)", val, val)
+	}
+	expected := map[object.HashKey]int64{
+		(&object.String{Value: "age"}).HashKey():  23,
+		(&object.String{Value: "year"}).HashKey(): 2024,
+		(&object.String{Value: "hiya"}).HashKey(): 45,
+		(&object.Integer{Value: 24}).HashKey():    24,
+		FALSE.HashKey():                           8,
+		TRUE.HashKey():                            23,
+	}
+
+	if len(hash.Pairs) != len(expected) {
+		t.Fatalf("Incorrect Number of Pairs in Hash. Expected %d got %d", len(hash.Pairs), len(expected))
+	}
+
+	for expKey, expVal := range expected {
+		pair, ok := hash.Pairs[expKey]
+		if !ok {
+			t.Errorf("Missing Pair for given Key in Pairs")
+		}
+		testIntegerObject(t, pair.Value, expVal)
+	}
+}
+
 func testEval(input string) object.Object {
 	lex := lexer.New(input)
 	parser := parser.New(lex)
