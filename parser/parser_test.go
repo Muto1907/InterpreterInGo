@@ -231,7 +231,7 @@ func TestWhileStatement(t *testing.T) {
 	if !ok {
 		t.Fatalf("Wrong Statementtype for Statements[0] expected=ExpressionStatement. got=%T", while.Body.Statements[0])
 	}
-	if !testInfixExpr(t, body.Expression, 5, "*", "5") {
+	if !testInfixExpr(t, body.Expression, 5, "*", 5) {
 		t.Fatalf("Wrong Expressiontype in Loop Body. expected 5 * 5 got=%s", body.Expression.String())
 	}
 
