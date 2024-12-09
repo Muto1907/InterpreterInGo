@@ -28,7 +28,8 @@ let name = "hello";
 "whatever"
 "what ever"
 [5, 3];
-{"name": "Mahmut"}
+{"name": "Mahmut"};
+while (3 < 4) { 3 + 8; }
 `
 
 	tests := []struct {
@@ -125,6 +126,19 @@ let name = "hello";
 		{token.STRING, "name"},
 		{token.COLON, ":"},
 		{token.STRING, "Mahmut"},
+		{token.BRACER, "}"},
+		{token.SEMICOLON, ";"},
+		{token.WHILE, "while"},
+		{token.PARENL, "("},
+		{token.INT, "3"},
+		{token.LT, "<"},
+		{token.INT, "4"},
+		{token.PARENR, ")"},
+		{token.BRACEL, "{"},
+		{token.INT, "3"},
+		{token.PLUS, "+"},
+		{token.INT, "8"},
+		{token.SEMICOLON, ";"},
 		{token.BRACER, "}"},
 		{token.EOF, ""},
 	}
