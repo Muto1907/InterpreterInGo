@@ -159,6 +159,21 @@ func TestIfElseExpression(t *testing.T) {
 	}
 }
 
+func TestWhileStatement(t *testing.T) {
+	tests := []struct {
+		input       string
+		expectedVal int64
+	}{
+		{`let y = 3; while(y < 4){ let y = y + 1; } return y`, 4},
+		{`let y = 3; while(y > 4){ let y = y + 1; } return y`, 3},
+	}
+
+	for _, tcase := range tests {
+		val := testEval(tcase.input)
+		testIntegerObject(t, val, tcase.expectedVal)
+	}
+}
+
 func TestErrorHandling(t *testing.T) {
 	tests := []struct {
 		Input            string
