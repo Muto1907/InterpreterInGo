@@ -202,6 +202,41 @@ func TestBooleanExpression(t *testing.T) {
 	}
 }
 
+func TestWhileStatement(t *testing.T) {
+	input := `while (3 < 4) { 5 * 5; }`
+	lex := lexer.New(input)
+	parser := New(lex)
+	program := parser.ParseProgram()
+	checkParserErrors(t, parser)
+	if len(program.Statements) != 1 {
+		t.Fatalf("program has not enough statements. got=%d",
+			len(program.Statements))
+	}
+
+	while, ok := program.Statements[0].(*ast.WhileStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not ast.WhileStatement. got=%T",
+			program.Statements[0])
+	}
+
+	if !testInfixExpr(t, while.Condition, 3, "<", 4) {
+		return
+	}
+
+	if len(while.Body.Statements) != 1 {
+		t.Fatalf("Wrong number of Statements in Loop Body. got=%d", len(while.Body.Statements))
+	}
+
+	body, ok := while.Body.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("Wrong Statementtype for Statements[0] expected=ExpressionStatement. got=%T", while.Body.Statements[0])
+	}
+	if !testInfixExpr(t, body.Expression, 5, "*", "5") {
+		t.Fatalf("Wrong Expressiontype in Loop Body. expected 5 * 5 got=%s", body.Expression.String())
+	}
+
+}
+
 func TestIfExpression(t *testing.T) {
 	input := `if (f > b) { g }`
 	lex := lexer.New(input)
