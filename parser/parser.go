@@ -126,6 +126,8 @@ func (parser *Parser) parseStatement() ast.Statement {
 		return parser.parseLetStatement()
 	case token.RETURN:
 		return parser.parseReturnStatement()
+	case token.WHILE:
+		return parser.parseWhileStatement()
 	default:
 		return parser.parseExpressionStatement()
 	}
@@ -155,6 +157,26 @@ func (parser *Parser) parseReturnStatement() *ast.ReturnStatement {
 		parser.nextToken()
 	}
 	return stmt
+}
+
+func (parser *Parser) parseWhileStatement() *ast.WhileStatement {
+	stmt := &ast.WhileStatement{Token: parser.currToken}
+	if !parser.expectPeek(token.PARENL) {
+		return nil
+	}
+	parser.nextToken()
+	stmt.Condition = parser.parseExpression(LOWEST)
+	if !parser.expectPeek(token.PARENR) {
+		return nil
+	}
+
+	if !parser.expectPeek(token.BRACEL) {
+		return nil
+	}
+	stmt.Body = parser.parseBlockStatement()
+
+	return stmt
+
 }
 
 func (parser *Parser) parseExpressionStatement() *ast.ExpressionStatement {
