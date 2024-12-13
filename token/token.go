@@ -19,16 +19,17 @@ const (
 	STRING = "STRING"
 
 	// Operators
-	ASSIGN = "="
-	PLUS   = "+"
-	MINUS  = "-"
-	MULT   = "*"
-	DIV    = "/"
-	NOT    = "!"
-	LT     = "<"
-	GT     = ">"
-	EQ     = "=="
-	NOT_EQ = "!="
+	ASSIGN    = "="
+	PLUS      = "+"
+	MINUS     = "-"
+	MULT      = "*"
+	DIV       = "/"
+	NOT       = "!"
+	LT        = "<"
+	GT        = ">"
+	EQ        = "=="
+	NOT_EQ    = "!="
+	AMPERSAND = "&"
 
 	// Delimeters
 	COMMA     = ","

@@ -30,6 +30,7 @@ let name = "hello";
 [5, 3];
 {"name": "Mahmut"};
 while (3 < 4) { 3 + 8; }
+let ptr = &3;
 `
 
 	tests := []struct {
@@ -140,6 +141,12 @@ while (3 < 4) { 3 + 8; }
 		{token.INT, "8"},
 		{token.SEMICOLON, ";"},
 		{token.BRACER, "}"},
+		{token.LET, "let"},
+		{token.IDENT, "ptr"},
+		{token.ASSIGN, "="},
+		{token.AMPERSAND, "&"},
+		{token.INT, "3"},
+		{token.SEMICOLON, ";"},
 		{token.EOF, ""},
 	}
 
