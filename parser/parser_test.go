@@ -491,6 +491,8 @@ func TestParsingPrefixExpr(t *testing.T) {
 		{"!false", "!", false},
 		{"!true", "!", true},
 		{"-false", "-", false},
+		{"&3", "&", 3},
+		{"*32", "*", 32},
 	}
 
 	for _, tcase := range Tests {

@@ -72,6 +72,8 @@ func New(lex *lexer.Lexer) *Parser {
 	parser.addInfixFnc(token.PARENL, parser.parseCallExpression)
 	parser.addInfixFnc(token.BRACKETL, parser.parseIndexExpr)
 	parser.addPrefixFnc(token.BRACEL, parser.parseHashLiteral)
+	parser.addPrefixFnc(token.AMPERSAND, parser.parsePrefixExpression)
+	parser.addPrefixFnc(token.MULT, parser.parsePrefixExpression)
 
 	parser.nextToken()
 	parser.nextToken()
