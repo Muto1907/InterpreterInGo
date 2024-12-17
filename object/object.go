@@ -29,6 +29,11 @@ type Object interface {
 	Inspect() string
 }
 
+type HeapObject struct {
+	Object   Object
+	RefCount int
+}
+
 type Environment struct {
 	state map[string]Object
 	outer *Environment
