@@ -22,6 +22,7 @@ const (
 	BUILTIN_OBJ  = "BUILTIN"
 	ARRAY_OBJ    = "ARRAY"
 	HASH_OBJ     = "HASH"
+	POINTER_OBJ  = "POINER"
 )
 
 type Object interface {
@@ -110,6 +111,18 @@ func (i *Integer) Inspect() string {
 
 func (i *Integer) HashKey() HashKey {
 	return HashKey{Type: i.Type(), Value: uint64(i.Value)}
+}
+
+type Pointer struct {
+	Value uint64
+}
+
+func (ptr *Pointer) Type() ObjectType {
+	return POINTER_OBJ
+}
+
+func (ptr *Pointer) Inspect() string {
+	return fmt.Sprintf("%d", ptr.Value)
 }
 
 type String struct {

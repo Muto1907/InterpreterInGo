@@ -112,6 +112,67 @@ func TestBangOperator(t *testing.T) {
 	}
 }
 
+func TestEvalPointerDeref(t *testing.T) {
+	tests := []struct {
+		input       string
+		expectedVal int64
+	}{
+		{
+			input:       "let ptr = &3; *ptr;",
+			expectedVal: 3,
+		},
+		{
+			input:       "let n = 5; let ptr = &n; *ptr;",
+			expectedVal: 5,
+		},
+		{
+			input:       "*&4",
+			expectedVal: 4,
+		},
+		{
+			input:       "let n = 24; let z = &n; n = 99, *z",
+			expectedVal: 99,
+		},
+	}
+
+	for _, tcase := range tests {
+		val := testEval(tcase.input)
+		testIntegerObject(t, val, tcase.expectedVal)
+	}
+}
+
+func TestPointerToArray(t *testing.T) {
+	tests := []struct {
+		input       string
+		expectedVal int64
+	}{
+		{
+			input:       "let arr = [1, 2, 3]; let ptr = &arr; *arr[0]",
+			expectedVal: 1,
+		},
+		{
+			input:       "let arr = [1, 2, 3]; let ptr = &arr; arr[0] = 55; *ptr[0]",
+			expectedVal: 55,
+		},
+	}
+
+	for _, tcase := range tests {
+		val := testEval(tcase.input)
+		testIntegerObject(t, val, tcase.expectedVal)
+	}
+}
+
+func TestPointerExpression(t *testing.T) {
+	input := "&34"
+	val := testEval(input)
+	_, ok := val.(*object.Pointer)
+	if !ok {
+		t.Fatalf("Object is not Pointer. got=%T(%v)", val, val)
+	}
+	derefVal := testEval("*" + input)
+	testIntegerObject(t, derefVal, 34)
+}
+
 func TestReturnStatements(t *testing.T) {
 	tests := []struct {
 		input       string
