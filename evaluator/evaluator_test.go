@@ -225,8 +225,8 @@ func TestWhileStatement(t *testing.T) {
 		input       string
 		expectedVal int64
 	}{
-		{`let y = 3; while(y < 4){ let y = y + 1; } return y`, 4},
-		{`let y = 3; while(y > 4){ let y = y + 1; } return y`, 3},
+		{`let y = 3; while(y < 4){ y = y + 1; } return y`, 4},
+		{`let y = 3; while(y > 4){ y = y + 1; } return y`, 3},
 	}
 
 	for _, tcase := range tests {
@@ -262,6 +262,7 @@ func TestErrorHandling(t *testing.T) {
 			"FUNCTION can not be used as HashKey",
 		},
 		{"x = 5;", "Variable not initialized: x"},
+		{"let x = 5; let x = 8", "Variable already initialized: x"},
 	}
 
 	for _, tcase := range tests {

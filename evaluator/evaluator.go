@@ -58,6 +58,10 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		if isError(val) {
 			return val
 		}
+		_, ok := env.Get(node.Name.Value)
+		if ok {
+			return newError("Variable already initialized: %s", node.Name.Value)
+		}
 		env.Set(node.Name.Value, val)
 	case *ast.AssignmentStatement:
 		val := Eval(node.Value, env)
