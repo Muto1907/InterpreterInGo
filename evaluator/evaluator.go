@@ -59,6 +59,16 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			return val
 		}
 		env.Set(node.Name.Value, val)
+	case *ast.AssignmentStatement:
+		val := Eval(node.Value, env)
+		if isError(val) {
+			return val
+		}
+		_, ok := env.Get(node.Name.Value)
+		if !ok {
+			return newError("Variable not initialized: %s", node.Name.Value)
+		}
+		env.Set(node.Name.Value, val)
 	case *ast.Identifier:
 		return evalIdentifier(node, env)
 	case *ast.FuncLiteral:
