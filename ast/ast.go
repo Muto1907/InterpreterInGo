@@ -41,6 +41,26 @@ func (p *Program) String() string {
 	return output.String()
 }
 
+type AssignmentStatement struct {
+	Token token.Token
+	Value Expression
+	Name  *Identifier
+}
+
+func (as *AssignmentStatement) statementNode() {}
+func (as *AssignmentStatement) TokenLiteral() string {
+	return as.Token.Literal
+}
+func (as *AssignmentStatement) String() string {
+	var output bytes.Buffer
+	output.WriteString(as.Name.String() + " = ")
+	if as.Value != nil {
+		output.WriteString(as.Value.String())
+	}
+	output.WriteString(";")
+	return output.String()
+}
+
 type WhileStatement struct {
 	Token     token.Token
 	Condition Expression
