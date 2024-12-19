@@ -56,6 +56,30 @@ func TestLetStatements(t *testing.T) {
 	}
 }
 
+func TestAssignmentStatements(t *testing.T) {
+
+	input := `let x = 5; x = 10;`
+	lex := lexer.New(input)
+	parser := New(lex)
+	program := parser.ParseProgram()
+	checkParserErrors(t, parser)
+
+	if len(program.Statements) != 2 {
+		t.Fatalf("Program does not contain 2 Statements. got = %d", len(program.Statements))
+	}
+
+	assStmt, ok := program.Statements[1].(*ast.AssignmentStatement)
+	if !ok {
+		t.Fatalf("Statement is not AssignmentStatement. got=%T", program.Statements[1])
+	}
+	if assStmt.Name.Value != "x" {
+		t.Fatalf("Assignment Name not 'x'. got = %s", assStmt.Name.Value)
+	}
+	if !testLiteralExpr(t, assStmt.Value, 10) {
+		return
+	}
+}
+
 func TestReturnStatements(t *testing.T) {
 	tests := []struct {
 		input       string

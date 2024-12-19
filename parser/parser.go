@@ -74,7 +74,6 @@ func New(lex *lexer.Lexer) *Parser {
 	parser.addPrefixFnc(token.BRACEL, parser.parseHashLiteral)
 	parser.addPrefixFnc(token.AMPERSAND, parser.parsePrefixExpression)
 	parser.addPrefixFnc(token.MULT, parser.parsePrefixExpression)
-
 	parser.nextToken()
 	parser.nextToken()
 	return parser
@@ -130,9 +129,29 @@ func (parser *Parser) parseStatement() ast.Statement {
 		return parser.parseReturnStatement()
 	case token.WHILE:
 		return parser.parseWhileStatement()
+	case token.IDENT:
+		if parser.peekTokenIs(token.ASSIGN) {
+			return parser.parseAssignmentStatement()
+		}
+		return parser.parseExpressionStatement()
 	default:
 		return parser.parseExpressionStatement()
 	}
+}
+
+func (parser *Parser) parseAssignmentStatement() *ast.AssignmentStatement {
+	stmt := &ast.AssignmentStatement{Token: parser.currToken}
+	stmt.Name = &ast.Identifier{Token: parser.currToken, Value: parser.currToken.Literal}
+	if !parser.expectPeek(token.ASSIGN) {
+		return nil
+	}
+	parser.nextToken()
+	stmt.Value = parser.parseExpression(LOWEST)
+
+	if parser.peekTokenIs(token.SEMICOLON) {
+		parser.nextToken()
+	}
+	return stmt
 }
 
 func (parser *Parser) parseLetStatement() *ast.LetStatement {
