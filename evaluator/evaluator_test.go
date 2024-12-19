@@ -261,6 +261,7 @@ func TestErrorHandling(t *testing.T) {
 			`{"name": "Me"}[fnc(x) { x }];`,
 			"FUNCTION can not be used as HashKey",
 		},
+		{"x = 5;", "Variable not initialized: x"},
 	}
 
 	for _, tcase := range tests {
@@ -274,6 +275,22 @@ func TestErrorHandling(t *testing.T) {
 		if errorObj.Message != tcase.ExpectedErrorMsg {
 			t.Errorf("Wrong Error message. Expected=%q, got=%q", tcase.ExpectedErrorMsg, errorObj.Message)
 		}
+	}
+}
+
+func TestAssignmentStatements(t *testing.T) {
+	tests := []struct {
+		Input       string
+		ExpectedVal int64
+	}{
+		{"let x = 5; x = 7; x", 7},
+		{"let x = 5 x = 5 * 5; x", 25},
+		{"let x = 5; x = 4 * x; x", 20},
+		{"let x = 5; let y = x; x = x + y; x", 10},
+	}
+	for _, tcase := range tests {
+		val := testEval(tcase.Input)
+		testIntegerObject(t, val, tcase.ExpectedVal)
 	}
 }
 
