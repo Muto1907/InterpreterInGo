@@ -553,8 +553,9 @@ func testEval(input string) object.Object {
 	parser := parser.New(lex)
 	program := parser.ParseProgram()
 	env := object.NewEnvironment()
+	evaluator := NewEval()
 
-	return Eval(program, env)
+	return evaluator.Eval(program, env)
 }
 
 func testBooleanObject(t *testing.T, booleanObject object.Object, expectedbool bool) bool {
