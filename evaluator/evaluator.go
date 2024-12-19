@@ -148,9 +148,29 @@ func (eva *Evaluator) EvalPrefixExpr(operator string, right object.Object) objec
 		return evalBangOperatorExpr(right)
 	case "-":
 		return evalPrefixMinusExpr(right)
+	case "&":
+		return eva.evalAmpersandExpr(right)
+	case "*":
+		return eva.evalDereference(right)
 	default:
 		return newError("unknown operator: %s%s", operator, right.Type())
 	}
+}
+
+func (eva *Evaluator) evalAmpersandExpr(obj object.Object) object.Object {
+	eva.Heap[eva.NextAdress] = object.NewHeapOject(obj)
+	ptr := &object.Pointer{Value: eva.NextAdress}
+	eva.NextAdress += 1
+	return ptr
+}
+
+func (eva *Evaluator) evalDereference(obj object.Object) object.Object {
+	if obj.Type() != object.POINTER_OBJ {
+		return newError("unknown operator: *%s", obj.Type())
+	}
+	ptr := obj.(*object.Pointer)
+	ret := eva.Heap[ptr.Value].Object
+	return ret
 }
 
 func evalBangOperatorExpr(obj object.Object) object.Object {

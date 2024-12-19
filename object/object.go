@@ -35,6 +35,10 @@ type HeapObject struct {
 	RefCount int
 }
 
+func NewHeapOject(object Object) HeapObject {
+	return HeapObject{Object: object, RefCount: 1}
+}
+
 type Environment struct {
 	state map[string]Object
 	outer *Environment
