@@ -129,25 +129,35 @@ func (parser *Parser) parseStatement() ast.Statement {
 		return parser.parseReturnStatement()
 	case token.WHILE:
 		return parser.parseWhileStatement()
-	case token.IDENT:
-		if parser.peekTokenIs(token.ASSIGN) {
-			return parser.parseAssignmentStatement()
-		}
-		return parser.parseExpressionStatement()
 	default:
-		return parser.parseExpressionStatement()
+		return parser.parseExpressionorAssignmentStatement()
 	}
 }
 
-func (parser *Parser) parseAssignmentStatement() *ast.AssignmentStatement {
-	stmt := &ast.AssignmentStatement{Token: parser.currToken}
-	stmt.Name = &ast.Identifier{Token: parser.currToken, Value: parser.currToken.Literal}
-	if !parser.expectPeek(token.ASSIGN) {
+func (parser *Parser) parseExpressionorAssignmentStatement() ast.Statement {
+	leftExp := parser.parseExpression(LOWEST)
+	if leftExp == nil {
 		return nil
 	}
-	parser.nextToken()
-	stmt.Value = parser.parseExpression(LOWEST)
 
+	if parser.peekTokenIs(token.ASSIGN) {
+		parser.nextToken()
+
+		assignStmt := &ast.AssignmentStatement{
+			Token: parser.currToken,
+			Left:  leftExp,
+		}
+		parser.nextToken()
+		assignStmt.Value = parser.parseExpression(LOWEST)
+
+		if parser.peekTokenIs(token.SEMICOLON) {
+			parser.nextToken()
+		}
+		return assignStmt
+	}
+
+	stmt := &ast.ExpressionStatement{Token: parser.currToken}
+	stmt.Expression = leftExp
 	if parser.peekTokenIs(token.SEMICOLON) {
 		parser.nextToken()
 	}

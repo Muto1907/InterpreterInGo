@@ -72,11 +72,54 @@ func TestAssignmentStatements(t *testing.T) {
 	if !ok {
 		t.Fatalf("Statement is not AssignmentStatement. got=%T", program.Statements[1])
 	}
-	if assStmt.Name.Value != "x" {
-		t.Fatalf("Assignment Name not 'x'. got = %s", assStmt.Name.Value)
+	assName, ok := assStmt.Left.(*ast.Identifier)
+	if !ok {
+		t.Fatalf("Left of Assignment is not Identifier. got=%T", assStmt.Left)
+	}
+	if assName.Value != "x" {
+		t.Fatalf("Assignment Name not 'x'. got = %s", assName.Value)
 	}
 	if !testLiteralExpr(t, assStmt.Value, 10) {
 		return
+	}
+}
+
+func TestAssignmentStatementsWithPrefixExpression(t *testing.T) {
+	tests := []struct {
+		input        string
+		expectedLeft string
+		expectedVal  interface{}
+	}{
+		{
+			input:        "*x = 5;",
+			expectedLeft: "(*x)",
+			expectedVal:  5,
+		},
+	}
+
+	for i, tt := range tests {
+		l := lexer.New(tt.input)
+		p := New(l)
+		program := p.ParseProgram()
+		checkParserErrors(t, p)
+
+		if len(program.Statements) != 1 {
+			t.Fatalf("[%d] program.Statements does not contain 1 statement. got=%d",
+				i, len(program.Statements))
+		}
+
+		stmt, ok := program.Statements[0].(*ast.AssignmentStatement)
+		if !ok {
+			t.Fatalf("[%d] stmt is not *ast.AssignmentStatement. got=%T",
+				i, program.Statements[0])
+		}
+
+		if stmt.Left.String() != tt.expectedLeft {
+			t.Errorf("[%d] left side String() wrong. expected=%q, got=%q",
+				i, tt.expectedLeft, stmt.Left.String())
+		}
+
+		testLiteralExpr(t, stmt.Value, tt.expectedVal)
 	}
 }
 

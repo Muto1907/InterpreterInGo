@@ -43,8 +43,8 @@ func (p *Program) String() string {
 
 type AssignmentStatement struct {
 	Token token.Token
+	Left  Expression
 	Value Expression
-	Name  *Identifier
 }
 
 func (as *AssignmentStatement) statementNode() {}
@@ -53,7 +53,7 @@ func (as *AssignmentStatement) TokenLiteral() string {
 }
 func (as *AssignmentStatement) String() string {
 	var output bytes.Buffer
-	output.WriteString(as.Name.String() + " = ")
+	output.WriteString(as.Left.String() + " = ")
 	if as.Value != nil {
 		output.WriteString(as.Value.String())
 	}

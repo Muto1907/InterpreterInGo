@@ -73,15 +73,7 @@ func (eva *Evaluator) Eval(node ast.Node, env *object.Environment) object.Object
 		}
 		env.Set(node.Name.Value, val)
 	case *ast.AssignmentStatement:
-		val := eva.Eval(node.Value, env)
-		if isError(val) {
-			return val
-		}
-		_, ok := env.Get(node.Name.Value)
-		if !ok {
-			return newError("Variable not initialized: %s", node.Name.Value)
-		}
-		env.Set(node.Name.Value, val)
+		return eva.evalAssignmentStatement(node, env)
 	case *ast.Identifier:
 		return eva.evalIdentifier(node, env)
 	case *ast.FuncLiteral:
@@ -428,4 +420,70 @@ func (eva *Evaluator) evalHashLiteral(node *ast.HashLiteral, env *object.Environ
 		pairs[hash] = object.HashPair{Key: key, Value: val}
 	}
 	return &object.Hash{Pairs: pairs}
+}
+
+func (eva *Evaluator) evalAssignmentStatement(stmt *ast.AssignmentStatement, env *object.Environment) object.Object {
+	val := eva.Eval(stmt.Value, env)
+	if isError(val) {
+		return val
+	}
+
+	switch left := stmt.Left.(type) {
+	case *ast.Identifier:
+		_, ok := env.Get(left.Value)
+		if !ok {
+			return newError("Variable not initialized: %s", left.Value)
+		}
+		env.Set(left.Value, val)
+		return val
+
+	case *ast.PrefixExpression:
+		if left.Operator == "*" {
+			pointerObj := eva.Eval(left.Right, env)
+			if isError(pointerObj) {
+				return pointerObj
+			}
+			if pointerObj.Type() != object.POINTER_OBJ {
+				return newError("cannot assign through non-pointer type: %s", pointerObj.Type())
+			}
+
+			ptr := pointerObj.(*object.Pointer)
+
+			eva.Heap[ptr.Value] = object.NewHeapOject(val)
+			return val
+		}
+
+		return newError("unsupported prefix operator in assignment: %s", left.Operator)
+	case *ast.IndexExpression:
+		arrayObj := eva.Eval(left.Left, env)
+		if isError(arrayObj) {
+			return arrayObj
+		}
+
+		indexObj := eva.Eval(left.Index, env)
+		if isError(indexObj) {
+			return indexObj
+		}
+		arr, ok := arrayObj.(*object.Array)
+		if ok {
+			intIdx, ok := indexObj.(*object.Integer)
+			if !ok {
+				return newError("array index is not an integer: %s", indexObj.Type())
+			}
+
+			idx := intIdx.Value
+			if idx < 0 || idx >= int64(len(arr.Elements)) {
+				return newError("array index out of bounds: %d", idx)
+			}
+
+			arr.Elements[idx] = val
+			return val
+		}
+
+		return newError("index assignment not supported for %s", arrayObj.Type())
+
+	default:
+		return newError("invalig assignment target: %T", left)
+	}
+
 }

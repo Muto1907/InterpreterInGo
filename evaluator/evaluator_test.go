@@ -130,8 +130,8 @@ func TestEvalPointerDeref(t *testing.T) {
 			expectedVal: 4,
 		},
 		{
-			input:       "let n = 24; let z = &n; n = 99, *z",
-			expectedVal: 99,
+			input:       "let x = &32; let f = fnc(y){*y = 4}; f(x); *x",
+			expectedVal: 4,
 		},
 	}
 
@@ -147,11 +147,11 @@ func TestPointerToArray(t *testing.T) {
 		expectedVal int64
 	}{
 		{
-			input:       "let arr = [1, 2, 3]; let ptr = &arr; *arr[0]",
+			input:       "let arr = [1, 2, 3]; let ptr = &arr; (*ptr)[0]",
 			expectedVal: 1,
 		},
 		{
-			input:       "let arr = [1, 2, 3]; let ptr = &arr; arr[0] = 55; *ptr[0]",
+			input:       "let arr = [1, 2, 3]; let ptr = &arr; arr[0] = 55; (*ptr)[0]",
 			expectedVal: 55,
 		},
 	}
@@ -263,6 +263,17 @@ func TestErrorHandling(t *testing.T) {
 		},
 		{"x = 5;", "Variable not initialized: x"},
 		{"let x = 5; let x = 8", "Variable already initialized: x"},
+		{"*true = 34", "cannot assign through non-pointer type: BOOLEAN"},
+		{"let array = [1,2,3,4], array[false] = 8;", "array index is not an integer: BOOLEAN"},
+		{"let arr = [1,2,3,4], arr[-1] = 8", "array index out of bounds: -1"},
+		{"let arr = 6; arr[0] = 7", "index assignment not supported for INTEGER"},
+		{`
+			let x = 54;
+			let ptr = &x;
+			(*ptr)[0] = 99;
+		`,
+			"index assignment not supported for INTEGER",
+		},
 	}
 
 	for _, tcase := range tests {
