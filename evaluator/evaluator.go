@@ -16,10 +16,11 @@ var (
 type Evaluator struct {
 	Heap       object.Heap
 	NextAdress uint64
+	Threshold  int
 }
 
 func NewEval() *Evaluator {
-	return &Evaluator{Heap: make(map[uint64]object.HeapObject), NextAdress: 0}
+	return &Evaluator{Heap: make(map[uint64]object.HeapObject), NextAdress: 0, Threshold: 10}
 }
 
 func (eva *Evaluator) MarkandSweep(env *object.Environment) {
@@ -87,7 +88,7 @@ func (eva *Evaluator) Sweep() {
 }
 
 func (eva *Evaluator) Eval(node ast.Node, env *object.Environment) object.Object {
-	if len(eva.Heap) > 9 {
+	if len(eva.Heap) >= eva.Threshold {
 		eva.MarkandSweep(env)
 	}
 	switch node := node.(type) {

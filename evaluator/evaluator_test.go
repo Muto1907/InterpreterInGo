@@ -559,6 +559,57 @@ func TestHashIndexExpr(t *testing.T) {
 	}
 }
 
+func TestGarbageCollection(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected interface{}
+	}{
+		{
+			`
+				let i = 0;
+				while(i < 100){
+					&32;
+					i = i +1;
+				}
+			`,
+			0,
+		},
+		{
+			`
+				let i = 0;
+				while(i < 101){
+					&32;
+					i = i +1;
+				}
+			`,
+			1,
+		},
+		{
+			`
+				let x = &64;
+				let i = 0;
+				while(i < 100){
+					&32;
+					i = i +1;
+				}
+			`,
+			2,
+		},
+	}
+	for _, tcase := range tests {
+		lex := lexer.New(tcase.input)
+		parser := parser.New(lex)
+		program := parser.ParseProgram()
+		env := object.NewEnvironment()
+		evaluator := NewEval()
+		evaluator.Eval(program, env)
+		if len(evaluator.Heap) != tcase.expected {
+			t.Errorf("Incorrect Heapsize. Expected=%d got = %d", tcase.expected, len(evaluator.Heap))
+		}
+	}
+
+}
+
 func testEval(input string) object.Object {
 	lex := lexer.New(input)
 	parser := parser.New(lex)

@@ -38,7 +38,7 @@ func Start(in io.Reader, out io.Writer) {
 		if evaluated != nil {
 			io.WriteString(out, evaluated.Inspect()+"\n")
 		}
-		//io.WriteString(out, fmt.Sprintf("Heap Size after eval: %d\n", len(eval.Heap)))
+		io.WriteString(out, fmt.Sprintf("Heap Size after eval: %d\n", len(eval.Heap)))
 
 	}
 }
