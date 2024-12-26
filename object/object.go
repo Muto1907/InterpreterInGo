@@ -41,31 +41,31 @@ func NewHeapOject(object Object) HeapObject {
 }
 
 type Environment struct {
-	state map[string]Object
-	outer *Environment
+	State map[string]Object
+	Outer *Environment
 }
 
 func NewEnvironment() *Environment {
 	st := make(map[string]Object)
-	return &Environment{state: st, outer: nil}
+	return &Environment{State: st, Outer: nil}
 }
 
 func (env *Environment) Set(ident string, val Object) Object {
-	env.state[ident] = val
+	env.State[ident] = val
 	return val
 }
 
 func (env *Environment) Get(ident string) (Object, bool) {
-	val, ok := env.state[ident]
-	if !ok && env.outer != nil {
-		val, ok = env.outer.Get(ident)
+	val, ok := env.State[ident]
+	if !ok && env.Outer != nil {
+		val, ok = env.Outer.Get(ident)
 	}
 	return val, ok
 }
 
-func NewEnclosedEnvironment(outer *Environment) *Environment {
+func NewEnclosedEnvironment(Outer *Environment) *Environment {
 	env := NewEnvironment()
-	env.outer = outer
+	env.Outer = Outer
 	return env
 }
 

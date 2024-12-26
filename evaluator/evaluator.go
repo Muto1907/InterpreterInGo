@@ -22,7 +22,74 @@ func NewEval() *Evaluator {
 	return &Evaluator{Heap: make(map[uint64]object.HeapObject), NextAdress: 0}
 }
 
+func (eva *Evaluator) MarkandSweep(env *object.Environment) {
+	eva.mark(env)
+	eva.Sweep()
+}
+
+func (eva *Evaluator) mark(env *object.Environment) {
+	if env == nil {
+		return
+	}
+
+	for _, val := range env.State {
+		eva.markIfPointer(val)
+	}
+	if env.Outer != nil {
+		eva.mark(env.Outer)
+	}
+}
+
+func (eva *Evaluator) markIfPointer(obj object.Object) {
+	ptr, ok := obj.(*object.Pointer)
+	if ok {
+		eva.markObject(ptr.Value)
+	}
+}
+
+func (eva *Evaluator) markObject(adress uint64) {
+	heapObj, ok := eva.Heap[adress]
+	if !ok {
+		return
+	}
+	if heapObj.IsMarked {
+		return
+	}
+	heapObj.IsMarked = true
+	eva.Heap[adress] = heapObj
+
+	eva.markChildren(heapObj.Object)
+}
+
+func (eva *Evaluator) markChildren(obj object.Object) {
+	switch o := obj.(type) {
+	case *object.Array:
+		for _, elem := range o.Elements {
+			eva.markIfPointer(elem)
+		}
+	case *object.Hash:
+		for _, pair := range o.Pairs {
+			eva.markIfPointer(pair.Key)
+			eva.markIfPointer(pair.Value)
+		}
+	}
+}
+
+func (eva *Evaluator) Sweep() {
+	for addr, heapObj := range eva.Heap {
+		if !heapObj.IsMarked {
+			delete(eva.Heap, addr)
+		} else {
+			heapObj.IsMarked = false
+			eva.Heap[addr] = heapObj
+		}
+	}
+}
+
 func (eva *Evaluator) Eval(node ast.Node, env *object.Environment) object.Object {
+	if len(eva.Heap) > 10 {
+		eva.MarkandSweep(env)
+	}
 	switch node := node.(type) {
 	case *ast.Program:
 		return eva.evalProgram(node, env)
