@@ -10,6 +10,7 @@ import (
 )
 
 type ObjectType string
+type Heap map[uint64]HeapObject
 
 const (
 	INTEGER_OBJ  = "INTEGER"

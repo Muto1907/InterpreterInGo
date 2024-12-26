@@ -14,7 +14,7 @@ var (
 )
 
 type Evaluator struct {
-	Heap       map[uint64]object.HeapObject
+	Heap       object.Heap
 	NextAdress uint64
 }
 
