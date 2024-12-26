@@ -35,9 +35,7 @@ func (eva *Evaluator) mark(env *object.Environment) {
 	for _, val := range env.State {
 		eva.markIfPointer(val)
 	}
-	if env.Outer != nil {
-		eva.mark(env.Outer)
-	}
+	eva.mark(env.Outer)
 }
 
 func (eva *Evaluator) markIfPointer(obj object.Object) {
@@ -72,6 +70,8 @@ func (eva *Evaluator) markChildren(obj object.Object) {
 			eva.markIfPointer(pair.Key)
 			eva.markIfPointer(pair.Value)
 		}
+	case *object.Function:
+		eva.mark(o.Env)
 	}
 }
 
@@ -87,7 +87,7 @@ func (eva *Evaluator) Sweep() {
 }
 
 func (eva *Evaluator) Eval(node ast.Node, env *object.Environment) object.Object {
-	if len(eva.Heap) > 10 {
+	if len(eva.Heap) > 9 {
 		eva.MarkandSweep(env)
 	}
 	switch node := node.(type) {
