@@ -32,11 +32,11 @@ type Object interface {
 
 type HeapObject struct {
 	Object   Object
-	RefCount int
+	IsMarked bool
 }
 
 func NewHeapOject(object Object) HeapObject {
-	return HeapObject{Object: object, RefCount: 1}
+	return HeapObject{Object: object, IsMarked: false}
 }
 
 type Environment struct {
