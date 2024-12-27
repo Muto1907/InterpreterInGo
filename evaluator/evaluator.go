@@ -14,9 +14,10 @@ var (
 )
 
 type Evaluator struct {
-	Heap       object.Heap
-	NextAdress uint64
-	Threshold  int
+	Heap        object.Heap
+	NextAdress  uint64
+	Threshold   int
+	visitedEnvs map[*object.Environment]bool
 }
 
 func NewEval() *Evaluator {
@@ -24,6 +25,7 @@ func NewEval() *Evaluator {
 }
 
 func (eva *Evaluator) MarkandSweep(env *object.Environment) {
+	eva.visitedEnvs = make(map[*object.Environment]bool)
 	eva.mark(env)
 	eva.Sweep()
 }
@@ -32,6 +34,10 @@ func (eva *Evaluator) mark(env *object.Environment) {
 	if env == nil {
 		return
 	}
+	if eva.visitedEnvs[env] {
+		return
+	}
+	eva.visitedEnvs[env] = true
 
 	for _, val := range env.State {
 		eva.markValue(val)
