@@ -1,9 +1,10 @@
 package repl
 
 import (
-	"bufio"
 	"fmt"
 	"io"
+
+	"github.com/chzyer/readline"
 
 	"github.com/Muto1907/interpreterInGo/evaluator"
 	"github.com/Muto1907/interpreterInGo/lexer"
@@ -14,18 +15,43 @@ import (
 const PROMPT = ">> "
 
 func Start(in io.Reader, out io.Writer) {
-	scanner := bufio.NewScanner(in)
+
+	cfg := &readline.Config{
+		Prompt:                 PROMPT,
+		HistoryFile:            "tmp/chimp_repl_history",
+		InterruptPrompt:        "^C",
+		EOFPrompt:              "exit",
+		DisableAutoSaveHistory: false,
+		EnableMask:             false,
+	}
+
+	rl, err := readline.NewEx(cfg)
+	if err != nil {
+		panic(err)
+	}
+	defer rl.Close()
+
 	env := object.NewEnvironment()
 	eval := evaluator.NewEval()
 
 	for {
-		fmt.Print(PROMPT)
-		scanned := scanner.Scan()
-		if !scanned {
+		line, err := rl.Readline()
+		if err == readline.ErrInterrupt {
+			if len(line) == 0 {
+				return
+			} else {
+				continue
+			}
+		} else if err == io.EOF {
+			return
+		} else if err != nil {
+			fmt.Fprintln(out, "Error reading line:", err)
 			return
 		}
 
-		line := scanner.Text()
+		if line == "" {
+			continue
+		}
 		l := lexer.New(line)
 		p := parser.New(l)
 
@@ -38,7 +64,7 @@ func Start(in io.Reader, out io.Writer) {
 		if evaluated != nil {
 			io.WriteString(out, evaluated.Inspect()+"\n")
 		}
-		io.WriteString(out, fmt.Sprintf("Heap Size after eval: %d\n", len(eval.Heap)))
+		//io.WriteString(out, fmt.Sprintf("Heap Size after eval: %d\n", len(eval.Heap)))
 
 	}
 }
