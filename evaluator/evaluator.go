@@ -34,15 +34,30 @@ func (eva *Evaluator) mark(env *object.Environment) {
 	}
 
 	for _, val := range env.State {
-		eva.markIfPointer(val)
+		eva.markValue(val)
 	}
 	eva.mark(env.Outer)
 }
 
-func (eva *Evaluator) markIfPointer(obj object.Object) {
-	ptr, ok := obj.(*object.Pointer)
-	if ok {
-		eva.markObject(ptr.Value)
+func (eva *Evaluator) markValue(obj object.Object) {
+	switch o := obj.(type) {
+
+	case *object.Pointer:
+		eva.markObject(o.Value)
+
+	case *object.Array:
+		for _, elem := range o.Elements {
+			eva.markValue(elem)
+		}
+
+	case *object.Hash:
+		for _, pair := range o.Pairs {
+			eva.markValue(pair.Key)
+			eva.markValue(pair.Value)
+		}
+
+	case *object.Function:
+		eva.mark(o.Env)
 	}
 }
 
@@ -57,23 +72,7 @@ func (eva *Evaluator) markObject(adress uint64) {
 	heapObj.IsMarked = true
 	eva.Heap[adress] = heapObj
 
-	eva.markChildren(heapObj.Object)
-}
-
-func (eva *Evaluator) markChildren(obj object.Object) {
-	switch o := obj.(type) {
-	case *object.Array:
-		for _, elem := range o.Elements {
-			eva.markIfPointer(elem)
-		}
-	case *object.Hash:
-		for _, pair := range o.Pairs {
-			eva.markIfPointer(pair.Key)
-			eva.markIfPointer(pair.Value)
-		}
-	case *object.Function:
-		eva.mark(o.Env)
-	}
+	eva.markValue(heapObj.Object)
 }
 
 func (eva *Evaluator) Sweep() {

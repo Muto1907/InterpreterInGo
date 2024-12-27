@@ -610,6 +610,84 @@ func TestGarbageCollection(t *testing.T) {
 
 }
 
+func TestGC_NestedArray(t *testing.T) {
+	input := `
+        {
+            let arr = [ &1, &2, &3 ];
+            // once we exit this block, arr goes out of scope
+        }
+    `
+	lex := lexer.New(input)
+	parser := parser.New(lex)
+	program := parser.ParseProgram()
+	evaluator := NewEval()
+	env := object.NewEnvironment()
+	evaluator.Eval(program, env)
+	heapSizeBefore := len(evaluator.Heap)
+	if heapSizeBefore < 3 {
+		t.Fatalf("expected at least 3 items in heap, got=%d", heapSizeBefore)
+	}
+	evaluator.MarkandSweep(env)
+
+	// After GC, arr is out of scope -> the 3 pointers should be unreachable
+	heapSizeAfter := len(evaluator.Heap)
+	if heapSizeAfter != 0 {
+		t.Errorf("expected 0 items after collecting unreachable pointers, got=%d", heapSizeAfter)
+	}
+}
+
+func TestGC_ClosureCapturingPointer(t *testing.T) {
+	input := `
+        let globalFunc = fnc() {
+            let x = &42;  
+            return fnc() { *x }; 
+        };
+        let f = globalFunc();
+    `
+	lex := lexer.New(input)
+	pars := parser.New(lex)
+	program := pars.ParseProgram()
+	evaluator := NewEval()
+	env := object.NewEnvironment()
+	evaluator.Eval(program, env)
+	// We expect that the pointer to 42 is STILL reachable,
+	// because 'f' references the environment where x was declared.
+	// So GC should NOT remove it.
+	heapSizeBefore := len(evaluator.Heap)
+	if heapSizeBefore == 0 {
+		t.Fatalf("expected some pointer in the heap, got=0")
+	}
+
+	// Force GC
+	evaluator.MarkandSweep(env)
+
+	// Because 'f' is in the environment, referencing the closure, pointer is still alive
+	heapSizeAfter := len(evaluator.Heap)
+	if heapSizeAfter != heapSizeBefore {
+		t.Errorf("expected pointer to remain. had %d items, after GC got %d",
+			heapSizeBefore, heapSizeAfter)
+	}
+
+	// Now if we do 'f = 0;' or something to overwrite the function, the pointer becomes unreachable:
+	input2 := `
+        f = 0;
+    `
+	lex = lexer.New(input2)
+	pars = parser.New(lex)
+	program = pars.ParseProgram()
+	evaluator = NewEval()
+	env = object.NewEnvironment()
+	evaluator.Eval(program, env)
+	// Another forced GC
+	evaluator.MarkandSweep(env)
+
+	// Now pointer is unreachable
+	finalSize := len(evaluator.Heap)
+	if finalSize != 0 {
+		t.Errorf("expected pointer gone after losing function reference, got=%d", finalSize)
+	}
+}
+
 func testEval(input string) object.Object {
 	lex := lexer.New(input)
 	parser := parser.New(lex)
