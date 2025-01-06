@@ -14,16 +14,18 @@
 - **Supported Data Types:**
   - Integers
   - Booleans
+  - Strings
+  - Pointers
 - **Expressions:**
   - Arithmetic Expressions
-  - `for` Loop
+  - `while` Loop
 - **Built-in Functions**
 - **First-Class Functions & Higher Order Functions**
 - **Closures**
 - **Data Structures:**
-  - String
-  - Array
-  - Map
+  - Arrays
+  - Maps
+- **Heap Memory**
 - **Garbage Collection**
 
 ### Examples:

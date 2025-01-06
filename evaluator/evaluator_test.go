@@ -614,7 +614,6 @@ func TestGC_NestedArray(t *testing.T) {
 	input := `
         {
             let arr = [ &1, &2, &3 ];
-            // once we exit this block, arr goes out of scope
         }
     `
 	lex := lexer.New(input)
