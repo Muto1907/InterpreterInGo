@@ -337,9 +337,17 @@ func (eva *Evaluator) evalWhileStatement(while *ast.WhileStatement, env *object.
 	if isError(condition) {
 		return condition
 	}
+
 	for isTruthy(condition) {
-		eva.Eval(while.Body, env)
+		val := eva.Eval(while.Body, env)
+		if val.Type() == object.RETURN_OBJ {
+			return val
+		}
 		condition = eva.Eval(while.Condition, env)
+		if isError(condition) {
+			return condition
+		}
+
 	}
 	return NULL
 
@@ -360,8 +368,9 @@ func isTruthy(object object.Object) bool {
 
 func (eva *Evaluator) evalBlockStatement(block *ast.BlockStatement, env *object.Environment) object.Object {
 	var obj object.Object
+	extendedEnv := object.NewEnclosedEnvironment(env)
 	for _, stmt := range block.Statements {
-		obj = eva.Eval(stmt, env)
+		obj = eva.Eval(stmt, extendedEnv)
 		if obj != nil {
 			ot := obj.Type()
 			if ot == object.RETURN_OBJ || ot == object.ERROR_OBJ {
