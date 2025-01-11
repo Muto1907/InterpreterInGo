@@ -252,8 +252,9 @@ func (iff *IfExpression) String() string {
 }
 
 type BlockStatement struct {
-	Token      token.Token
-	Statements []Statement
+	Token          token.Token
+	Statements     []Statement
+	IsFunctionBody bool
 }
 
 func (blck *BlockStatement) statementNode() {}

@@ -368,9 +368,14 @@ func isTruthy(object object.Object) bool {
 
 func (eva *Evaluator) evalBlockStatement(block *ast.BlockStatement, env *object.Environment) object.Object {
 	var obj object.Object
-	extendedEnv := object.NewEnclosedEnvironment(env)
+	var blockEnv *object.Environment
+	if block.IsFunctionBody {
+		blockEnv = env
+	} else {
+		blockEnv = object.NewEnclosedEnvironment(env)
+	}
 	for _, stmt := range block.Statements {
-		obj = eva.Eval(stmt, extendedEnv)
+		obj = eva.Eval(stmt, blockEnv)
 		if obj != nil {
 			ot := obj.Type()
 			if ot == object.RETURN_OBJ || ot == object.ERROR_OBJ {
@@ -512,15 +517,16 @@ func (eva *Evaluator) evalAssignmentStatement(stmt *ast.AssignmentStatement, env
 
 	switch left := stmt.Left.(type) {
 	case *ast.Identifier:
-		_, ok := env.GetLocal(left.Value)
-		if !ok {
-			_, ok := env.Get(left.Value)
-			if !ok {
-				return newError("Variable not initialized: %s", left.Value)
-			}
-			env.SetOuter(left.Value, val)
+		_, localOk := env.GetLocal(left.Value)
+		if localOk {
+			env.Set(left.Value, val)
+			return val
 		}
-		env.Set(left.Value, val)
+		_, ok := env.Get(left.Value)
+		if !ok {
+			return newError("Variable not initialized: %s", left.Value)
+		}
+		env.SetOuter(left.Value, val)
 		return val
 
 	case *ast.PrefixExpression:
@@ -569,7 +575,7 @@ func (eva *Evaluator) evalAssignmentStatement(stmt *ast.AssignmentStatement, env
 		return newError("index assignment not supported for %s", arrayObj.Type())
 
 	default:
-		return newError("invalig assignment target: %T", left)
+		return newError("invalid assignment target: %T", left)
 	}
 
 }

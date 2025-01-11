@@ -398,6 +398,7 @@ func (parser *Parser) parseFunctionLiteral() ast.Expression {
 		return nil
 	}
 	fnc.Body = parser.parseBlockStatement()
+	fnc.Body.IsFunctionBody = true
 	return fnc
 }
 
