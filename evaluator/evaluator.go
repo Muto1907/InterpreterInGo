@@ -140,7 +140,7 @@ func (eva *Evaluator) Eval(node ast.Node, env *object.Environment) object.Object
 		if isError(val) {
 			return val
 		}
-		_, ok := env.Get(node.Name.Value)
+		_, ok := env.GetLocal(node.Name.Value)
 		if ok {
 			return newError("Variable already initialized: %s", node.Name.Value)
 		}
@@ -503,9 +503,13 @@ func (eva *Evaluator) evalAssignmentStatement(stmt *ast.AssignmentStatement, env
 
 	switch left := stmt.Left.(type) {
 	case *ast.Identifier:
-		_, ok := env.Get(left.Value)
+		_, ok := env.GetLocal(left.Value)
 		if !ok {
-			return newError("Variable not initialized: %s", left.Value)
+			_, ok := env.Get(left.Value)
+			if !ok {
+				return newError("Variable not initialized: %s", left.Value)
+			}
+			env.SetOuter(left.Value, val)
 		}
 		env.Set(left.Value, val)
 		return val

@@ -55,11 +55,25 @@ func (env *Environment) Set(ident string, val Object) Object {
 	return val
 }
 
+func (env *Environment) SetOuter(ident string, val Object) Object {
+	_, ok := env.Outer.Get(ident)
+	if ok {
+		env.Outer.State[ident] = val
+		return val
+	}
+	return env.Outer.SetOuter(ident, val)
+}
+
 func (env *Environment) Get(ident string) (Object, bool) {
 	val, ok := env.State[ident]
 	if !ok && env.Outer != nil {
 		val, ok = env.Outer.Get(ident)
 	}
+	return val, ok
+}
+
+func (env *Environment) GetLocal(ident string) (Object, bool) {
+	val, ok := env.State[ident]
 	return val, ok
 }
 
