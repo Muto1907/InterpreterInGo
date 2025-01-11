@@ -569,7 +569,7 @@ func TestGarbageCollection(t *testing.T) {
 				let i = 0;
 				while(i < 100){
 					&32;
-					i = i +1;
+					i = i + 1;
 				}
 			`,
 			0,

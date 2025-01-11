@@ -127,7 +127,7 @@ func (ptr *Pointer) Type() ObjectType {
 }
 
 func (ptr *Pointer) Inspect() string {
-	return fmt.Sprintf("%d", ptr.Value)
+	return fmt.Sprintf("0x%x", ptr.Value)
 }
 
 type String struct {
