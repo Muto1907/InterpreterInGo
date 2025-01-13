@@ -56,9 +56,12 @@ func (env *Environment) Set(ident string, val Object) Object {
 }
 
 func (env *Environment) SetOuter(ident string, val Object) Object {
-	_, ok := env.Outer.Get(ident)
+	if env.Outer == nil {
+		return &Error{Message: fmt.Sprintf("Variable not initialized: %s", ident)}
+	}
+	_, ok := env.Outer.GetLocal(ident)
 	if ok {
-		env.Outer.State[ident] = val
+		env.Outer.Set(ident, val)
 		return val
 	}
 	return env.Outer.SetOuter(ident, val)

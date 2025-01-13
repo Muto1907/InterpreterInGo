@@ -116,14 +116,12 @@ func TestScoping_BlockInFunction(t *testing.T) {
 	testIntegerObject(t, val, 15)
 }
 
-/*
 func TestScoping_WhileLoopBlocks(t *testing.T) {
 	input := `
 		let i = 0;
 		while (i < 5) {
 			if (true){
-				let temp = i;
-				i = temp + 2;
+				i = i + 2;
 			}
 		}
 		i;
@@ -131,4 +129,3 @@ func TestScoping_WhileLoopBlocks(t *testing.T) {
 	val := testEval(input)
 	testIntegerObject(t, val, 6)
 }
-*/
