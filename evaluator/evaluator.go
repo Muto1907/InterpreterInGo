@@ -340,6 +340,13 @@ func (eva *Evaluator) evalWhileStatement(while *ast.WhileStatement, env *object.
 
 	for isTruthy(condition) {
 		val := eva.Eval(while.Body, env)
+		if val == nil {
+			condition = eva.Eval(while.Condition, env)
+			if isError(condition) {
+				return condition
+			}
+			continue
+		}
 		if val.Type() == object.RETURN_OBJ {
 			return val
 		}
@@ -350,7 +357,6 @@ func (eva *Evaluator) evalWhileStatement(while *ast.WhileStatement, env *object.
 
 	}
 	return NULL
-
 }
 
 func isTruthy(object object.Object) bool {
@@ -520,14 +526,14 @@ func (eva *Evaluator) evalAssignmentStatement(stmt *ast.AssignmentStatement, env
 		_, localOk := env.GetLocal(left.Value)
 		if localOk {
 			env.Set(left.Value, val)
-			return val
+			return nil
 		}
 		_, ok := env.Get(left.Value)
 		if !ok {
 			return newError("Variable not initialized: %s", left.Value)
 		}
 		env.SetOuter(left.Value, val)
-		return val
+		return nil
 
 	case *ast.PrefixExpression:
 		if left.Operator == "*" {
