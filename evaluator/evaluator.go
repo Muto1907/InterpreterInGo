@@ -548,7 +548,7 @@ func (eva *Evaluator) evalAssignmentStatement(stmt *ast.AssignmentStatement, env
 			ptr := pointerObj.(*object.Pointer)
 
 			eva.Heap[ptr.Value] = object.NewHeapOject(val)
-			return val
+			return nil
 		}
 
 		return newError("unsupported prefix operator in assignment: %s", left.Operator)
@@ -575,7 +575,7 @@ func (eva *Evaluator) evalAssignmentStatement(stmt *ast.AssignmentStatement, env
 			}
 
 			arr.Elements[idx] = val
-			return val
+			return nil
 		}
 
 		return newError("index assignment not supported for %s", arrayObj.Type())
