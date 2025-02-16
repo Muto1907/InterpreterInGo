@@ -130,11 +130,11 @@ func (parser *Parser) parseStatement() ast.Statement {
 	case token.WHILE:
 		return parser.parseWhileStatement()
 	default:
-		return parser.parseExpressionorAssignmentStatement()
+		return parser.parseExpressionOrAssignmentStatement()
 	}
 }
 
-func (parser *Parser) parseExpressionorAssignmentStatement() ast.Statement {
+func (parser *Parser) parseExpressionOrAssignmentStatement() ast.Statement {
 	leftExp := parser.parseExpression(LOWEST)
 	if leftExp == nil {
 		return nil
