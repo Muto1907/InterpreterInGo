@@ -612,7 +612,7 @@ func TestGarbageCollection(t *testing.T) {
 
 func TestGC_NestedArray(t *testing.T) {
 	input := `
-        {
+        if (true) {
             let arr = [ &1, &2, &3 ];
         }
     `
