@@ -15,13 +15,13 @@ var (
 
 type Evaluator struct {
 	Heap        object.Heap
-	NextAdress  uint64
+	NextAddress uint64
 	Threshold   int
 	visitedEnvs map[*object.Environment]bool
 }
 
 func NewEval() *Evaluator {
-	return &Evaluator{Heap: make(map[uint64]object.HeapObject), NextAdress: 0, Threshold: 10}
+	return &Evaluator{Heap: make(map[uint64]object.HeapObject), NextAddress: 0, Threshold: 10}
 }
 
 func (eva *Evaluator) MarkandSweep(env *object.Environment) {
@@ -229,9 +229,9 @@ func (eva *Evaluator) EvalPrefixExpr(operator string, right object.Object) objec
 }
 
 func (eva *Evaluator) evalAmpersandExpr(obj object.Object) object.Object {
-	eva.Heap[eva.NextAdress] = object.NewHeapOject(obj)
-	ptr := &object.Pointer{Value: eva.NextAdress}
-	eva.NextAdress += 1
+	eva.Heap[eva.NextAddress] = object.NewHeapOject(obj)
+	ptr := &object.Pointer{Value: eva.NextAddress}
+	eva.NextAddress += 1
 	return ptr
 }
 
