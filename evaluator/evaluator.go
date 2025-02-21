@@ -128,7 +128,7 @@ func (eva *Evaluator) Eval(node ast.Node, env *object.Environment) object.Object
 	case *ast.IfExpression:
 		return eva.evalIfExpression(node, env)
 	case *ast.WhileStatement:
-		return eva.evalWhileStatement(node, env)
+		eva.evalWhileStatement(node, env)
 	case *ast.ReturnStatement:
 		val := eva.Eval(node.ReturnValue, env)
 		if isError(val) {
@@ -340,17 +340,18 @@ func (eva *Evaluator) evalWhileStatement(while *ast.WhileStatement, env *object.
 
 	for isTruthy(condition) {
 		val := eva.Eval(while.Body, env)
-		if isError(val) {
-			return val
-		}
-		if val.Type() == object.RETURN_OBJ {
-			return val
+		if val != nil {
+			if isError(val) {
+				return val
+			}
+			if val.Type() == object.RETURN_OBJ {
+				return val
+			}
 		}
 		condition = eva.Eval(while.Condition, env)
 		if isError(condition) {
 			return condition
 		}
-
 	}
 	return NULL
 
