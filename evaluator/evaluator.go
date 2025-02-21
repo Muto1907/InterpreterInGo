@@ -340,6 +340,9 @@ func (eva *Evaluator) evalWhileStatement(while *ast.WhileStatement, env *object.
 
 	for isTruthy(condition) {
 		val := eva.Eval(while.Body, env)
+		if isError(val) {
+			return val
+		}
 		if val.Type() == object.RETURN_OBJ {
 			return val
 		}
