@@ -24,6 +24,10 @@ func NewEval() *Evaluator {
 	return &Evaluator{Heap: make(map[uint64]object.HeapObject), NextAddress: 0, Threshold: 10}
 }
 
+func (ev *Evaluator) SetThreshold(threshold int) {
+	ev.Threshold = threshold
+}
+
 func (eva *Evaluator) MarkandSweep(env *object.Environment) {
 	eva.visitedEnvs = make(map[*object.Environment]bool)
 	eva.mark(env)
@@ -93,7 +97,7 @@ func (eva *Evaluator) Sweep() {
 }
 
 func (eva *Evaluator) Eval(node ast.Node, env *object.Environment) object.Object {
-	if len(eva.Heap) >= eva.Threshold {
+	if len(eva.Heap)%eva.Threshold == 0 {
 		eva.MarkandSweep(env)
 	}
 	switch node := node.(type) {
