@@ -128,7 +128,10 @@ func (eva *Evaluator) Eval(node ast.Node, env *object.Environment) object.Object
 	case *ast.IfExpression:
 		return eva.evalIfExpression(node, env)
 	case *ast.WhileStatement:
-		eva.evalWhileStatement(node, env)
+		val := eva.evalWhileStatement(node, env)
+		if isError(val) {
+			return val
+		}
 	case *ast.ReturnStatement:
 		val := eva.Eval(node.ReturnValue, env)
 		if isError(val) {
