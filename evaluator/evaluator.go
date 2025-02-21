@@ -149,7 +149,10 @@ func (eva *Evaluator) Eval(node ast.Node, env *object.Environment) object.Object
 		}
 		env.Set(node.Name.Value, val)
 	case *ast.AssignmentStatement:
-		return eva.evalAssignmentStatement(node, env)
+		val := eva.evalAssignmentStatement(node, env)
+		if isError(val) {
+			return val
+		}
 	case *ast.Identifier:
 		return eva.evalIdentifier(node, env)
 	case *ast.FuncLiteral:
