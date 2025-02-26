@@ -2,6 +2,7 @@ package evaluator
 
 import (
 	"fmt"
+	"math"
 
 	"github.com/Muto1907/interpreterInGo/ast"
 	"github.com/Muto1907/interpreterInGo/object"
@@ -62,7 +63,6 @@ func (eva *Evaluator) markValue(obj object.Object) {
 
 	case *object.Hash:
 		for _, pair := range o.Pairs {
-			eva.markValue(pair.Key)
 			eva.markValue(pair.Value)
 		}
 
@@ -97,7 +97,7 @@ func (eva *Evaluator) Sweep() {
 }
 
 func (eva *Evaluator) Eval(node ast.Node, env *object.Environment) object.Object {
-	if len(eva.Heap)%eva.Threshold == 0 {
+	if len(eva.Heap) >= eva.Threshold {
 		eva.MarkandSweep(env)
 	}
 	switch node := node.(type) {
@@ -233,6 +233,16 @@ func (eva *Evaluator) EvalPrefixExpr(operator string, right object.Object) objec
 }
 
 func (eva *Evaluator) evalAmpersandExpr(obj object.Object) object.Object {
+	i := uint64(0)
+	_, ok := eva.Heap[eva.NextAddress]
+	for ok {
+		if i == math.MaxUint64 {
+			return newError("Heap Memory is full")
+		}
+		i++
+		eva.NextAddress += 1
+		_, ok = eva.Heap[eva.NextAddress]
+	}
 	eva.Heap[eva.NextAddress] = object.NewHeapOject(obj)
 	ptr := &object.Pointer{Value: eva.NextAddress}
 	eva.NextAddress += 1
