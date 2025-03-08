@@ -133,7 +133,7 @@ func (eva *Evaluator) Eval(node ast.Node, env *object.Environment) object.Object
 		return eva.evalIfExpression(node, env)
 	case *ast.WhileStatement:
 		val := eva.evalWhileStatement(node, env)
-		if isError(val) {
+		if isError(val) || val.Type() == object.RETURN_OBJ {
 			return val
 		}
 	case *ast.ReturnStatement:
