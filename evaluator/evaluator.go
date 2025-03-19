@@ -546,11 +546,7 @@ func (eva *Evaluator) evalAssignmentStatement(stmt *ast.AssignmentStatement, env
 			env.Set(left.Value, val)
 			return val
 		}
-		_, ok := env.Get(left.Value)
-		if !ok {
-			return newError("Variable not initialized: %s", left.Value)
-		}
-		env.SetOuter(left.Value, val)
+		val = env.SetOuter(left.Value, val)
 		return val
 
 	case *ast.PrefixExpression:
