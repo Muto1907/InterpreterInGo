@@ -15,14 +15,15 @@ var (
 )
 
 type Evaluator struct {
-	Heap        object.Heap
-	NextAddress uint64
-	Threshold   int
-	visitedEnvs map[*object.Environment]bool
+	Heap              object.Heap
+	NextAddress       uint64
+	Threshold         int
+	visitedEnvs       map[*object.Environment]bool
+	pointersAllocated uint64
 }
 
 func NewEval() *Evaluator {
-	return &Evaluator{Heap: make(map[uint64]object.HeapObject), NextAddress: 0, Threshold: 10}
+	return &Evaluator{Heap: make(map[uint64]object.HeapObject), NextAddress: 0, Threshold: 100, pointersAllocated: 0}
 }
 
 func (ev *Evaluator) SetThreshold(threshold int) {
@@ -97,9 +98,7 @@ func (eva *Evaluator) Sweep() {
 }
 
 func (eva *Evaluator) Eval(node ast.Node, env *object.Environment) object.Object {
-	if len(eva.Heap) >= eva.Threshold {
-		eva.MarkandSweep(env)
-	}
+
 	switch node := node.(type) {
 	case *ast.Program:
 		return eva.evalProgram(node, env)
@@ -116,7 +115,7 @@ func (eva *Evaluator) Eval(node ast.Node, env *object.Environment) object.Object
 		if isError(right) {
 			return right
 		}
-		return eva.EvalPrefixExpr(node.Operator, right)
+		return eva.EvalPrefixExpr(node.Operator, right, env)
 	case *ast.InfixExpression:
 		left := eva.Eval(node.Left, env)
 		if isError(left) {
@@ -217,14 +216,14 @@ func nativeBooltoBooleanObject(b bool) *object.Boolean {
 	return FALSE
 }
 
-func (eva *Evaluator) EvalPrefixExpr(operator string, right object.Object) object.Object {
+func (eva *Evaluator) EvalPrefixExpr(operator string, right object.Object, env *object.Environment) object.Object {
 	switch operator {
 	case "!":
 		return evalBangOperatorExpr(right)
 	case "-":
 		return evalPrefixMinusExpr(right)
 	case "&":
-		return eva.evalAmpersandExpr(right)
+		return eva.evalAmpersandExpr(right, env)
 	case "*":
 		return eva.evalDereference(right)
 	default:
@@ -232,7 +231,7 @@ func (eva *Evaluator) EvalPrefixExpr(operator string, right object.Object) objec
 	}
 }
 
-func (eva *Evaluator) evalAmpersandExpr(obj object.Object) object.Object {
+func (eva *Evaluator) evalAmpersandExpr(obj object.Object, env *object.Environment) object.Object {
 	i := uint64(0)
 	_, ok := eva.Heap[eva.NextAddress]
 	for ok {
@@ -245,7 +244,11 @@ func (eva *Evaluator) evalAmpersandExpr(obj object.Object) object.Object {
 	}
 	eva.Heap[eva.NextAddress] = object.NewHeapOject(obj)
 	ptr := &object.Pointer{Value: eva.NextAddress}
+	eva.pointersAllocated += 1
 	eva.NextAddress += 1
+	if eva.pointersAllocated%uint64(eva.Threshold) == 0 {
+		eva.MarkandSweep(env)
+	}
 	return ptr
 }
 
