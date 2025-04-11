@@ -151,8 +151,8 @@ func (eva *Evaluator) Eval(node ast.Node, env *object.Environment) object.Object
 			return newError("Variable already initialized: %s", node.Name.Value)
 		}
 		env.Set(node.Name.Value, val)
-	case *ast.AssignmentStatement:
-		val := eva.evalAssignmentStatement(node, env)
+	case *ast.ReassignmentStatement:
+		val := eva.evalReassignmentStatement(node, env)
 		if isError(val) {
 			return val
 		}
@@ -536,7 +536,7 @@ func (eva *Evaluator) evalHashLiteral(node *ast.HashLiteral, env *object.Environ
 	return &object.Hash{Pairs: pairs}
 }
 
-func (eva *Evaluator) evalAssignmentStatement(stmt *ast.AssignmentStatement, env *object.Environment) object.Object {
+func (eva *Evaluator) evalReassignmentStatement(stmt *ast.ReassignmentStatement, env *object.Environment) object.Object {
 	val := eva.Eval(stmt.Value, env)
 	if isError(val) {
 		return val

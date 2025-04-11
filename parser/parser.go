@@ -143,7 +143,7 @@ func (parser *Parser) parseExpressionOrAssignmentStatement() ast.Statement {
 	if parser.peekTokenIs(token.ASSIGN) {
 		parser.nextToken()
 
-		assignStmt := &ast.AssignmentStatement{
+		assignStmt := &ast.ReassignmentStatement{
 			Token: parser.currToken,
 			Left:  leftExp,
 		}

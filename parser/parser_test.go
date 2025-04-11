@@ -56,7 +56,7 @@ func TestLetStatements(t *testing.T) {
 	}
 }
 
-func TestAssignmentStatements(t *testing.T) {
+func TestReassignmentStatements(t *testing.T) {
 
 	input := `let x = 5; x = 10;`
 	lex := lexer.New(input)
@@ -68,7 +68,7 @@ func TestAssignmentStatements(t *testing.T) {
 		t.Fatalf("Program does not contain 2 Statements. got = %d", len(program.Statements))
 	}
 
-	assStmt, ok := program.Statements[1].(*ast.AssignmentStatement)
+	assStmt, ok := program.Statements[1].(*ast.ReassignmentStatement)
 	if !ok {
 		t.Fatalf("Statement is not AssignmentStatement. got=%T", program.Statements[1])
 	}
@@ -108,7 +108,7 @@ func TestAssignmentStatementsWithPrefixExpression(t *testing.T) {
 				i, len(program.Statements))
 		}
 
-		stmt, ok := program.Statements[0].(*ast.AssignmentStatement)
+		stmt, ok := program.Statements[0].(*ast.ReassignmentStatement)
 		if !ok {
 			t.Fatalf("[%d] stmt is not *ast.AssignmentStatement. got=%T",
 				i, program.Statements[0])

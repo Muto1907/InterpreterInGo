@@ -41,17 +41,17 @@ func (p *Program) String() string {
 	return output.String()
 }
 
-type AssignmentStatement struct {
+type ReassignmentStatement struct {
 	Token token.Token
 	Left  Expression
 	Value Expression
 }
 
-func (as *AssignmentStatement) statementNode() {}
-func (as *AssignmentStatement) TokenLiteral() string {
+func (as *ReassignmentStatement) statementNode() {}
+func (as *ReassignmentStatement) TokenLiteral() string {
 	return as.Token.Literal
 }
-func (as *AssignmentStatement) String() string {
+func (as *ReassignmentStatement) String() string {
 	var output bytes.Buffer
 	output.WriteString(as.Left.String() + " = ")
 	if as.Value != nil {
